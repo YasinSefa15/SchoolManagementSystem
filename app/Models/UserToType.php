@@ -30,4 +30,5 @@ class UserToType extends Model
     public function type(){
         return $this->hasOne(UserType::class,'id','type_id');
     }
+
 }

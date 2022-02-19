@@ -46,7 +46,7 @@ Route::controller(LectureController::class)->name('lecture.')->prefix('lectures'
     Route::get('view/{id}', 'view')->name('view');
 });
 
-Route::controller(OfferedLectureController::class)->name('offered.')->prefix('lecture/offered')->group(function () {
+Route::controller(OfferedLectureController::class)->middleware('confirm')->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
     Route::get('/create', 'create')->name('create'); //kullanmadım şimdilik
     Route::get('', 'read')->name('read');
     Route::get('/update', 'update')->name('update');

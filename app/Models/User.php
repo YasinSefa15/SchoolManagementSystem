@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,7 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'identification'
+        'identification',
+        'number'
     ];
 
 
@@ -42,7 +44,7 @@ class User extends Authenticatable
 
 
     public function types(){
-        return $this->hasMany(UserToType::class);
+        return $this->hasOne(UserToType::class);
     }
 
     public function tokens(){

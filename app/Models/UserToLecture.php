@@ -19,7 +19,9 @@ class UserToLecture extends Model
         'status'
     ];
 
-
+    public function user(){
+        return $this->hasOne(User::class,'id','user_id');
+    }
 
     public function lectureDetails(){
         return $this->hasOne(LectureDetail::class,'lecture_id','lecture_id');

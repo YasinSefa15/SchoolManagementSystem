@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\APIMessage;
+use App\Http\Traits\ResponseTrait;
 use App\Models\Lecture;
 use App\Models\OfferedLecture;
 use App\Models\User;
@@ -14,9 +15,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
+
 class OfferedLectureController extends Controller
 {
-    use APIMessage;
+    use APIMessage, ResponseTrait;
     //Açılan derslerin zamanlarını günceller.
     //dersin vakti geçtiğinde ise hepsini silsin. ARAŞTIR
     public function update(Request $request){
@@ -28,13 +30,13 @@ class OfferedLectureController extends Controller
         ];
         $validator = Validator::make($request->all(),$rules);
         if($validator->fails()){
-            return response()->json($this->APIMessage([
+            return $this->responseTrait([
                 'code' => 400,
-                'message' => "Lütfen formunuzu kontrol ediniz.",
+                'message' => 'Lütfen formunuzu kontrol ediniz.',
                 'result' => $validator->errors()
-            ]),Response::HTTP_BAD_REQUEST);
+            ]);
         }
-        //veritabanında tr saati ile tutuyor
+        /** todo: utc ile tutmasını sağla-tr saati ile tutuyo */
         $result = DB::table('lectures')
             ->where('year','=',$request->get('year'))
             ->where('semester','=',$request->get('semester'))
@@ -43,21 +45,14 @@ class OfferedLectureController extends Controller
                 'start_date' => $request->get('start_date'),
                 'end_date' => $request->get('end_date')
             ]);
-        return isset($result) ?
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_CREATED,
-                    'message' => $request->route()->getName(),
-                    'result' => $result
-                ]),Response::HTTP_CREATED) :
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_BAD_REQUEST,
-                    'message' => $request->route()->getName()
-                ]),Response::HTTP_BAD_REQUEST);
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'read');
     }
 
-    //burada ileride departman eşleşmesi yapıp görüntüleyecek
+    /** todo : departman eşleşmesi yapıp görüntüleyecek */
     public function read(Request $request){
         $result = DB::table('offered_lectures')
             ->where('start_date','<',now())
@@ -68,39 +63,30 @@ class OfferedLectureController extends Controller
             ->select('offered_lectures.lecture_id','lecture_details.code','lecture_details.credit','users.name','lecture_details.date')
             ->get();
 
-        return isset($result) ?
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_OK,
-                    'message' => $request->route()->getName(),
-                    'result' => $result
-                ]),Response::HTTP_OK) :
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_BAD_REQUEST,
-                    'message' => $request->route()->getName()
-                ]),Response::HTTP_BAD_REQUEST);
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'read');
     }
 
     //kullanıcının seçtiği dersler
     public function view(Request $request){
-        //user_id middleware den gelecek ileride. SONRA BAKK!!!!!!!!
         $result = DB::table('user_to_lectures')
-            ->join('offered_lectures','user_to_lectures.lecture_id','=','offered_lectures.lecture_id')
+            ->where('user_id','=',$request->get('user')['id'])
+            ->join('lecture_details','user_to_lectures.lecture_id','=','lecture_details.lecture_id')
+            ->join('offered_lectures','offered_lectures.lecture_id','=','lecture_details.lecture_id')
             ->where('start_date','<',now())
             ->where('end_date','>',now())
+            ->join('users','users.id','=','lecture_details.lecturer_id')
+            ->select('user_to_lectures.user_id','user_to_lectures.lecture_id','user_to_lectures.status',
+                'lecture_details.code','lecture_details.code','lecture_details.credit','users.name')
             ->get();
-        return isset($result) ?
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_CREATED,
-                    'message' => $request->route()->getName(),
-                    'result' => $result
-                ]),Response::HTTP_CREATED) :
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_BAD_REQUEST,
-                    'message' => $request->route()->getName()
-                ]),Response::HTTP_BAD_REQUEST);
+
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'read');
     }
 }

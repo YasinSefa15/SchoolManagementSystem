@@ -20,6 +20,7 @@ class TokenMiddleware
     public function handle(Request $request, Closure $next)
     {
         $user_token = UserToken::where('token','=',$request->header('x-token'))->first();
+        $hierarchy = $user_token->user->types()->first()->type()->first()->hierarchy;
         if(isset($user_token)){
             $user = $user_token->user;
             $request->attributes->add([
@@ -27,8 +28,9 @@ class TokenMiddleware
                     'id' => $user->id,
                     'email' => $user->email,
                     'token' => $user_token,
-                    'type_id' => $user->types[0]['type_id'],
-                    'type' => $user->types[0]['type']
+                    'type_id' => $user->types->type_id,
+                    'type' => $user->types->type,
+                    'hierarchy' => $hierarchy
                 ]
             ]);
 

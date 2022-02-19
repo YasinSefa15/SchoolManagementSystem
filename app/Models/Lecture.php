@@ -25,5 +25,12 @@ class Lecture extends Model
         return $this->hasOne(OfferedLecture::class,'lecture_id','id');
     }
 
+    public function usersToLecture(){
+        return $this->hasMany(UserToLecture::class,'lecture_id','id');
+    }
+    public function users(){
+        return $this->hasManyThrough(User::class,UserToLecture::class,'lecture_id','id','id');
+    }
+
 
 }

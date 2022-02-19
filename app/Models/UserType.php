@@ -18,4 +18,8 @@ class UserType extends Model
     public function types(){
         return $this->hasMany(UserToType::class);
     }
+
+//    public function module_route(){
+//        return $this->hasMany()
+//    }
 }

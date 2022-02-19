@@ -15,4 +15,12 @@ class TypeToPermission extends Model
       'type_id',
       'modules_routes_id'
     ];
+
+    public function route(){
+        return $this->hasOne(ModuleRoute::class,'id','modules_routes_id');
+    }
+
+    public function type(){
+        return $this->hasOne(UserType::class,'id','type_id');
+    }
 }

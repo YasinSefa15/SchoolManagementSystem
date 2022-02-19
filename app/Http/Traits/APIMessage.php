@@ -7,25 +7,11 @@ use Illuminate\Support\Facades\DB;
 trait APIMessage
 {
     public function APIMessage(array $config,array $request = null){
-        $result =  [
+        $message =  $this->codes([
             'code' => $config['code'],
-            'message' => $this->codes([
-                'code' => $config['code'],
-                'message' => $config['message']
-            ])
-        ];
-
-        if(isset($config['result'])){
-            $result = array_merge($result,[
-                'result' => $config['result']
-            ]);
-        }
-        if (isset($config['token'])){
-            $result = array_merge($result,[
-               'token' => $config['token']
-            ]);
-        }
-        return $result;
+            'message' => $config['message']
+        ]);
+        return $message;
     }
 
     private function codes(array $config){
