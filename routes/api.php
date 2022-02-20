@@ -3,15 +3,14 @@
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\LectureController;
+use App\Http\Controllers\Api\LectureToExamController;
 use App\Http\Controllers\Api\OfferedLectureController;
-use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\SupervisorController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserToLectureController;
 use App\Http\Controllers\Api\UserTypeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Module\ModuleController;
-use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -56,7 +55,7 @@ Route::controller(DepartmentController::class)->name('department.')->prefix('dep
 //->middleware('confirm')
 Route::controller(LectureController::class)->name('lecture.')->prefix('lectures')->group(function () {
     Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read');
+    Route::get('', 'read')->name('read'); //sunulan dersler
     Route::get('/update/{id}', 'update')->name('update');
     Route::get('view/{id}', 'view')->name('view');
 });
@@ -82,7 +81,15 @@ Route::controller(SupervisorController::class)->name('supervisor.')->prefix('sup
     Route::get('view/{id}', 'view')->name('view');
 });
 
-//user route u içerisinden yapıyoruz zaten bunu. Ve buradaki tüm işlemlere gerek yok en nihayetinde.
+Route::controller(LectureToExamController::class)->name('lecture-to-exam.')->prefix('lecture-to-exam')->group(function () {
+    Route::get('/create', 'create')->name('create'); //sınav oluşturur
+    Route::get('/delete/{id}', 'delete')->name('delete'); //sınav siler
+    Route::get('{id}', 'read')->name('read'); //verilen hocaya ait tüm dersler sınavlarla birlikte gösterilir
+    Route::get('/update/{id}', 'update')->name('update'); //verilen id deli exami günceller
+    Route::get('view/{id}', 'view')->name('view'); //o dersin examlerini gösterir
+});
+
+//bazı routelar ileride kullanılmayabilir.
 Route::controller(UserTypeController::class)->name('user-type.')->prefix('user-type')->group(function () {
     Route::get('/create', 'create')->name('create');
     Route::get('/update/{id}', 'update')->name('update');

@@ -73,7 +73,6 @@ class OfferedLectureController extends Controller
 
     /** todo : departman eşleşmesi yapıp görüntüleyecek */
     public function read(Request $request){
-        //öğrencinin departmanına göre dersler gelir.
         $result = DB::table('offered_lectures')
             ->where('start_at','<',now())
             ->where('end_at','>',now())
