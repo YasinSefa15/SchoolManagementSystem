@@ -29,7 +29,6 @@ class DepartmentController extends Controller
             'faculty_id' => $request->get('faculty_id'),
             'name' => $request->get('name')
         ]);
-
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
