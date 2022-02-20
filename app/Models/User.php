@@ -42,6 +42,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function userToDepartment(){
+        return $this->hasOne(UserToDepartment::class);
+    }
 
     public function types(){
         return $this->hasOne(UserToType::class);

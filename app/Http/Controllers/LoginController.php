@@ -13,9 +13,8 @@ class LoginController extends Controller
 {
     use APIMessage, ResponseTrait;
     public function read(Request $request){
-        $result = User::whereEmail($request->get('email'))->first();
+        $result = User::where('email',$request->get('email'))->first();
         $token = $result == null ? : $result->tokens()->where('device',$request->header('x-device'))->first()['token'];
-
         return ($result !=null && Hash::check($request->get('password'),$result->password)) ?
             $this->responseTrait([
                 'code' => null,

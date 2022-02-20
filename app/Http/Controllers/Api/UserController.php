@@ -23,6 +23,7 @@ class UserController extends Controller
             'email' => 'required|string|unique:users,email',
             'type' => 'required|string|exists:user_types,type',
             'identification' => 'required|integer',
+            'department_id' => 'required|integer|exists:departments,id',
             'number' => 'required|integer'
         ];
         $validator = Validator::make($request->all(),$rules);
@@ -45,10 +46,13 @@ class UserController extends Controller
             'type_id' => $type->id,
             'type' => $type->type
         ]);
-        $this->createToken([
-            'user' => $result,
-            'device' => 'web'
+        $result->userToDepartment()->create([
+           'department_id' => $request->get('department_id')
         ]);
+//        $this->createToken([
+//            'user' => $result,
+//            'device' => 'web'
+//        ]);
         $result->type = $request->get('type');
         return $this->responseTrait([
             'code' => null,
@@ -58,10 +62,10 @@ class UserController extends Controller
     }
 
     public function read(Request $request){
-
-        $result = User::cursor()->filter(function($user){
-            $user->{'type'} = $user->types[0]['type'];
-            unset($user->types);
+        /** todo : hepsinin type aynı geliyor*/
+        $result = User::get()->each(function($user){
+                $user->{'type'} = $user->types->first()->type;
+                unset($user->types);
             return true;
         });
         return $this->responseTrait([

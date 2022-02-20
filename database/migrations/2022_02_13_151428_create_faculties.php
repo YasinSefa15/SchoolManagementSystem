@@ -13,12 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('offered_lectures', function (Blueprint $table) {
-            $table->integer('year');
-            $table->enum('semester',['spring','fall']);
-            $table->enum('type',['semester','add-drop']);
-            $table->dateTime('start_at')->nullable();//Y-M-D H:M:S
-            $table->dateTime('end_at')->nullable();//Y-M-D H:M:S
+        Schema::create('faculties', function (Blueprint $table) {
+            $table->id();
+            $table->tinyText('name');
         });
     }
 
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('offered_lectures');
+        Schema::dropIfExists('faculties');
     }
 };

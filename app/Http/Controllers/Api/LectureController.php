@@ -9,7 +9,6 @@ use App\Models\Lecture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-//git push attempt
 class LectureController extends Controller
 {
     use APIMessage, ResponseTrait;
@@ -18,6 +17,7 @@ class LectureController extends Controller
         $rules = [
             'name' => 'required|string',
             'year' => 'required|integer',
+            'department_id' => 'required|integer|exists:departments,id',
             'semester' => 'required|in:fall,spring',
             'code' => 'required|string',
             'lecturer_id' => 'required|integer|exists:user_to_type,user_id,type,lecturer',
@@ -37,34 +37,26 @@ class LectureController extends Controller
         }
         $result = Lecture::create([
             'name' => $request->get('name'),
-            'year' => $request->get('year'),
-            'semester' => $request->get('semester')
-        ]);
-
-        $result->details()->create([
+            'department_id' => $request->get('department_id'),
             'code' => $request->get('code'),
             'lecturer_id' => $request->get('lecturer_id'),
             'credit' => $request->get('credit'),
             'quota' => $request->get('quota'),
-            'date' => json_encode($request->get('date'))
+            'date' => json_encode($request->get('date')),
+            'year' => $request->get('year'),
+            'semester' => $request->get('semester'),
         ]);
-
-        $result->offered()->create([]);
 
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
             'result' => $result
-        ], 'read');
+        ], 'create');
     }
 
     public function read(Request $request){
         $validator = Validator::make($request->all(),['year'=> 'required|integer', 'semester' => 'required|in:spring,fall']);
 
-        $result = Lecture::with('details')
-            ->where('year','=',$request->get('year'))
-            ->where('semester','=',$request->get('semester'))
-            ->get();
         if ($validator->fails()){
             return $this->responseTrait([
                 'code' => 400,
@@ -72,6 +64,9 @@ class LectureController extends Controller
                 'result' => $validator->errors()
             ]);
         }
+        $result = Lecture::where('year','=',$request->get('year'))
+            ->where('semester','=',$request->get('semester'))
+            ->get();
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
@@ -84,10 +79,11 @@ class LectureController extends Controller
             'name' => 'nullable|string',
             'year' => 'nullable|integer',
             'semester' => 'nullable|in:fall,semester',
+            'lecturer_id' => 'nullable|integer|exists:user_to_type,user_id,type,lecturer',
             'code' => 'nullable|string',
             'credit' => 'nullable|integer',
             'quota' => 'nullable|integer',
-            'date' => 'nullable|integer'
+            'date' => 'nullable|array'
         ];
 
         $validator = Validator::make($request->all(),$rules);
@@ -99,24 +95,18 @@ class LectureController extends Controller
             ]);
         }
         $result = Lecture::where('id',$id)->first();
-        if ($result != null){
-            $result->update([
-                'name' => $request->get('name') ?? $result->name,
-                'year' => $request->get('year') ?? $result->year,
-                'semester' => $request->get('semester') ?? $result->semester
-            ]);
-            $result->details()->first()->update($request->all());
-        }
+        $result == null ? : $result->update($request->all());
 
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
             'result' => $result
-        ], 'read');
+        ], 'update');
     }
 
+    /** todo : user lecture ilişkileri halledilince recheck */
     public function view(Request $request,$id){
-        $result = Lecture::with('users','details')->where('id',$id)->first();
+        $result = Lecture::with('users')->where('id',$id)->first();
 
         return $this->responseTrait([
                 'code' => null,

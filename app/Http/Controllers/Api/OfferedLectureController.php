@@ -19,14 +19,37 @@ use Symfony\Component\HttpFoundation\Response;
 class OfferedLectureController extends Controller
 {
     use APIMessage, ResponseTrait;
-    //Açılan derslerin zamanlarını günceller.
-    //dersin vakti geçtiğinde ise hepsini silsin. ARAŞTIR
+
+    public function create(Request $request){
+        $rules = [
+            'start_at' => 'required|date_format:Y-m-d H:i',
+            'end_at' => 'required|date_format:Y-m-d H:i',
+            'year' => 'required|date_format:Y',
+            'semester' => 'required|in:fall,spring',
+            'type' => 'required|in:semester,add-drop',
+        ];
+        $validator = Validator::make($request->all(),$rules);
+        if($validator->fails()){
+            return $this->responseTrait([
+                'code' => 400,
+                'message' => 'Lütfen formunuzu kontrol ediniz.',
+                'result' => $validator->errors()
+            ]);
+        }
+        $result = OfferedLecture::create($request->all());
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'create');
+    }
     public function update(Request $request){
         $rules = [
-            'start_date' => 'required|date_format:Y-m-d H:i',
-            'end_date' => 'required|date_format:Y-m-d H:i',
+            'start_at' => 'nullable|date_format:Y-m-d H:i',
+            'end_at' => 'nullable|date_format:Y-m-d H:i',
             'year' => 'required|date_format:Y',
-            'semester' => 'required|in:fall,spring'
+            'semester' => 'required|in:fall,spring',
+            'type' => 'required|in:semester,add-drop'
         ];
         $validator = Validator::make($request->all(),$rules);
         if($validator->fails()){
@@ -37,30 +60,33 @@ class OfferedLectureController extends Controller
             ]);
         }
         /** todo: utc ile tutmasını sağla-tr saati ile tutuyo */
-        $result = DB::table('lectures')
-            ->where('year','=',$request->get('year'))
-            ->where('semester','=',$request->get('semester'))
-            ->join('offered_lectures','lectures.id','=','offered_lectures.lecture_id')
-            ->update([
-                'start_date' => $request->get('start_date'),
-                'end_date' => $request->get('end_date')
-            ]);
+        $result = OfferedLecture::where('year',$request->get('year'))
+            ->where('semester',$request->get('semester'))
+            ->where('type',$request->get('type'))
+            ->update($request->all());
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
             'result' => $result
-        ], 'read');
+        ], 'update');
     }
 
     /** todo : departman eşleşmesi yapıp görüntüleyecek */
     public function read(Request $request){
+        //öğrencinin departmanına göre dersler gelir.
         $result = DB::table('offered_lectures')
-            ->where('start_date','<',now())
-            ->where('end_date','>',now())
-            ->join('lecture_details','lecture_details.lecture_id','=','offered_lectures.lecture_id')
-            ->join('lectures','lectures.id','=','offered_lectures.lecture_id')
-            ->join('users','users.id','=','lecture_details.lecturer_id')
-            ->select('offered_lectures.lecture_id','lecture_details.code','lecture_details.credit','users.name','lecture_details.date')
+            ->where('start_at','<',now())
+            ->where('end_at','>',now())
+            ->join('user_to_department',function($join) use($request){
+                $join->where('user_to_department.user_id','=',$request->get('user_id'));
+            })
+            ->join('lectures', function ($join) use ($request){
+                $join->on('lectures.department_id', '=', 'user_to_department.department_id')
+                    ->on('lectures.semester','=','offered_lectures.semester')
+                    ->on('lectures.year','=','offered_lectures.year');
+            })
+            ->join('users','users.id','=','lectures.lecturer_id')
+            ->select('lectures.name AS lecture_name','lectures.id','lectures.code','users.name AS lecturer_name','lectures.credit','users.name','lectures.date')
             ->get();
 
         return $this->responseTrait([
@@ -71,16 +97,19 @@ class OfferedLectureController extends Controller
     }
 
     //kullanıcının seçtiği dersler
-    public function view(Request $request){
+    public function view(Request $request,$id){
         $result = DB::table('user_to_lectures')
-            ->where('user_id','=',$request->get('user')['id'])
-            ->join('lecture_details','user_to_lectures.lecture_id','=','lecture_details.lecture_id')
-            ->join('offered_lectures','offered_lectures.lecture_id','=','lecture_details.lecture_id')
-            ->where('start_date','<',now())
-            ->where('end_date','>',now())
-            ->join('users','users.id','=','lecture_details.lecturer_id')
-            ->select('user_to_lectures.user_id','user_to_lectures.lecture_id','user_to_lectures.status',
-                'lecture_details.code','lecture_details.code','lecture_details.credit','users.name')
+            ->where('user_id','=',$id)
+            ->join('lectures','user_to_lectures.lecture_id','=','lectures.id')
+            ->join('offered_lectures', function ($join) {
+                $join->on('offered_lectures.year', '=', 'lectures.year')
+                    ->on('offered_lectures.semester','=','lectures.semester')
+                    ->where('start_at','<',now())
+                    ->where('end_at','>',now());
+            })
+            ->join('users','users.id','=','lectures.lecturer_id')
+            ->select('lectures.name AS lecture_name','lectures.id','lectures.code', 'users.name AS lecturer_name'
+                ,'lectures.credit','users.name','lectures.date','user_to_lectures.status')
             ->get();
 
         return $this->responseTrait([

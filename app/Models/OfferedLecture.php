@@ -17,19 +17,16 @@ class OfferedLecture extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'lecture_id',
-        'start_date',
-        'end_date'
+        'year',
+        'semester',
+        'type',
+        'start_at',
+        'end_at'
     ];
 
-
-    public function lecture(){
-        return $this->hasOne(Lecture::class,'id','lecture_id');
+    public function lectures(){
+        return $this->hasMany(Lecture::class,'year','year');
     }
 
-    //denenmedi
-    public function userToLecture(){
-        return $this->hasMany(UserToLecture::class);
-    }
 
 }

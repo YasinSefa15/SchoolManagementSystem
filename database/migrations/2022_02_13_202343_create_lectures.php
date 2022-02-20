@@ -16,8 +16,18 @@ return new class extends Migration
         Schema::create('lectures', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->unsignedBigInteger('department_id');
+            $table->foreign('department_id')->references('id')->on('departments');
+            $table->string('code');
+            $table->unsignedBigInteger('lecturer_id');
+            $table->foreign('lecturer_id')->references('id')->on('users');
+            $table->integer('credit');
+            $table->integer('registered')->default('0');
+            $table->integer('quota');
+            $table->json('date');
             $table->integer('year');
             $table->enum('semester',['fall','spring']);
+
         });
     }
 

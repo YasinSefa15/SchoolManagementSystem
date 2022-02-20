@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\LectureController;
 use App\Http\Controllers\Api\OfferedLectureController;
 use App\Http\Controllers\Api\RegisterController;
@@ -32,13 +34,26 @@ Route::controller(ModuleController::class)->name('module.')->prefix('modules')->
     Route::get('/{id}', 'view')->name('view');
 });
 
-Route::controller(UserController::class)->middleware('confirm')->name('user.')->prefix('users')->group(function () {
+Route::controller(UserController::class)->name('user.')->prefix('users')->group(function () {
     Route::get('/create', 'create')->name('create');
     Route::get('', 'read')->name('read');
     Route::get('/update/{id}', 'update')->name('update');
     Route::get('view/{id}', 'view')->name('view');
 });
 
+Route::controller(FacultyController::class)->name('faculty.')->prefix('faculties')->group(function () {
+    Route::get('/create', 'create')->name('create');
+    Route::get('', 'read')->name('read');
+    Route::get('/update/{id}', 'update')->name('update');
+    Route::get('view/{id}', 'view')->name('view');
+});
+Route::controller(DepartmentController::class)->name('department.')->prefix('departments')->group(function () {
+    Route::get('/create', 'create')->name('create');
+    Route::get('', 'read')->name('read');
+    Route::get('/update/{id}', 'update')->name('update');
+    Route::get('view/{id}', 'view')->name('view');
+});
+//->middleware('confirm')
 Route::controller(LectureController::class)->name('lecture.')->prefix('lectures')->group(function () {
     Route::get('/create', 'create')->name('create');
     Route::get('', 'read')->name('read');
@@ -46,12 +61,12 @@ Route::controller(LectureController::class)->name('lecture.')->prefix('lectures'
     Route::get('view/{id}', 'view')->name('view');
 });
 
-Route::controller(OfferedLectureController::class)->middleware('confirm')->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
+Route::controller(OfferedLectureController::class)->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
     Route::get('/create', 'create')->name('create'); //kullanmadım şimdilik
     Route::get('', 'read')->name('read');
     Route::get('/update', 'update')->name('update');
-    Route::get('/view','view')->name('view'); // o kullanıcının alabileceği dersler listenmeli
-});
+    Route::get('/view/{id}','view')->name('view'); // o kullanıcının alabileceği dersler listenmeli
+});  //->middleware('confirm')
 
 //user route u içerisinden yapıyoruz zaten bunu. Ve buradaki tüm işlemlere gerek yok en nihayetinde.
 Route::controller(UserTypeController::class)->name('user-type.')->prefix('user-type')->group(function () {

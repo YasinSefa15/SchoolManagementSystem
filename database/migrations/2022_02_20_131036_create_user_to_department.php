@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('user_types', function (Blueprint $table) {
-            $table->integer('hierarchy');
+        Schema::create('user_to_department', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('department_id');
+            $table->foreign('department_id')->references('id')->on('departments');
         });
     }
 
@@ -25,8 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('user_types', function (Blueprint $table) {
-            $table->dropColumn('hierarchy');
-        });
+        Schema::dropIfExists('user_to_department');
     }
 };
