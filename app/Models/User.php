@@ -42,6 +42,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function supervisior(){
+        return $this->hasOne(StudentToSupervisior::class,'student_id','id');
+    }
+
     public function userToDepartment(){
         return $this->hasOne(UserToDepartment::class);
     }

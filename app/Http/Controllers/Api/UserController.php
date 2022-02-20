@@ -7,6 +7,7 @@ use App\Http\Traits\APIMessage;
 use App\Http\Traits\PermissionTrait;
 use App\Http\Traits\ResponseTrait;
 use App\Http\Traits\TokenTrait;
+use App\Models\Supervisor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,7 @@ class UserController extends Controller
                 'result' => $validator->errors()
             ]);
         }
+        $supervisior = Supervisor::where('department_id',$request->get('department_id'))->get()->random(1)->first();
         $result = User::create([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
@@ -48,6 +50,9 @@ class UserController extends Controller
         ]);
         $result->userToDepartment()->create([
            'department_id' => $request->get('department_id')
+        ]);
+        $request->get('type') != 'student' ? : $result->supervisior()->create([
+            'lecturer_id' => $supervisior->lecturer_id
         ]);
 //        $this->createToken([
 //            'user' => $result,

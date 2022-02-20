@@ -4,107 +4,83 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\APIMessage;
+use App\Http\Traits\ResponseTrait;
+use App\Models\Department;
+use App\Models\StudentToSupervisior;
 use App\Models\Supervisor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class SupervisorController extends Controller
-{ //LOG TUTULACAK
-    use APIMessage;
+{
+    use ResponseTrait;
     public function create(Request $request){
         $rules = [
-            'student_id' => 'required|integer|exists:user_to_type,user_id,type,student',
+            'department_id' => 'required|integer|exists:departments,department_id',
             'lecturer_id' => 'required|integer|exists:user_to_type,user_id,type,lecturer'
         ];
         $validator = Validator::make($request->all(),$rules);
 
         if($validator->fails()){
-            return response()->json($this->APIMessage([
+            return $this->responseTrait([
                 'code' => 400,
-                'message' => "Lütfen formunuzu kontrol ediniz.",
+                'message' => 'Lütfen formunuzu kontrol ediniz.',
                 'result' => $validator->errors()
-            ]),Response::HTTP_BAD_REQUEST);
-        }else{
-            $result = Supervisor::create([
-                'student_id' => $request->get('student_id'),
-                'lecturer_id' => $request->get('lecturer_id')
             ]);
-            return isset($result) ?
-                response()->json(
-                    $this->APIMessage([
-                        'code' => Response::HTTP_CREATED,
-                        'message' => $request->route()->getName(),
-                        'result' => $request->get('type')
-
-                    ]),Response::HTTP_CREATED) :
-                response()->json(
-                    $this->APIMessage([
-                        'code' => Response::HTTP_BAD_REQUEST,
-                        'message' => $request->route()->getName()
-                    ]),Response::HTTP_BAD_REQUEST);
         }
+        $result = Supervisor::create([
+            'student_id' => $request->get('student_id'),
+            'lecturer_id' => $request->get('lecturer_id')
+        ]);
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'create');
     }
 
+    //ilgili departmanın danışmanları
     public function read(Request $request){
-        $result = Supervisor::with('lecturer')->get();
-        return isset($result) ?
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_OK,
-                    'message' => $request->route()->getName(),
-                    'result' => $result
-                ]),Response::HTTP_OK) :
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_BAD_REQUEST,
-                    'message' => $request->route()->getName()
-                ]),Response::HTTP_BAD_REQUEST);
+        $result = Department::with('lecturers')->where('id',$request->get('department_id'))->get(); //
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'read');
     }
 
-    public function update(Request $request,$id){
+    /** todo : student_to_supervisior tablo adı yanlış. ..._supervisor olacak */
+    public function update(Request $request){
         $rules = [
-            'student_id' => 'required|integer|exists:user_to_type,user_id,type,student',
-            'lecturer_id' => 'required|integer|exists:user_to_type,user_id,type,lecturer'
+            'student_id' => 'required|integer|exists:student_to_supervisior,student_id',
+            'lecturer_id' => 'required|integer|exists:lecture_to_supervisor,lecturer_id'
         ];
         $validator = Validator::make($request->all(),$rules);
         if($validator->fails()){
-            return response()->json($this->APIMessage([
+            return $this->responseTrait([
                 'code' => 400,
-                'message' => 'Lütfen formu doğru bir şekilde doldurunuz',
+                'message' => 'Lütfen formunuzu kontrol ediniz.',
                 'result' => $validator->errors()
-            ]));
+            ]);
         }
 
-        $result = Supervisor::where('lecturer_id',$id)->first();
-        $result == null ? : $result->update($request->all());
+        $result = StudentToSupervisior::where('student_id',$request->get('student_id'))->first();
+        $result == null ? : $result->update(['lecturer_id' => $request->get('lecturer_id')]);
 
-        return $result ?
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_OK,
-                    'message' => $request->route()->getName()
-                ]),Response::HTTP_OK) :
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_BAD_REQUEST,
-                    'message' => $request->route()->getName()
-                ]),Response::HTTP_BAD_REQUEST);
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'update');
     }
 
     public function view(Request $request,$id){
-        $result = Supervisor::with('student')->where('lecturer_id',$id)->get();
-        return $result ?
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_OK,
-                    'message' => $request->route()->getName(),
-                    'result' => $result
-                ]),Response::HTTP_OK) :
-            response()->json(
-                $this->APIMessage([
-                    'code' => Response::HTTP_BAD_REQUEST,
-                    'message' => $request->route()->getName()
-                ]),Response::HTTP_BAD_REQUEST);
+        $result = StudentToSupervisior::with('students')->where('lecturer_id',$id)->get();
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'view');
     }
 }

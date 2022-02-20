@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        //log tutulabilir
-        Schema::create('supervisors', function (Blueprint $table) {
-            $table->id();
+        Schema::create('lecture_to_supervisor', function (Blueprint $table) {
             $table->unsignedBigInteger('lecturer_id');
             $table->foreign('lecturer_id')->references('id')->on('users');
-            $table->unsignedBigInteger('student_id');
-            $table->foreign('student_id')->references('id')->on('users');
+            $table->unsignedBigInteger('department_id');
+            $table->foreign('department_id')->references('id')->on('departments');
         });
     }
 
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('supervisors');
+        Schema::dropIfExists('lecture_to_supervisor');
     }
 };

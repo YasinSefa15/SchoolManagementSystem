@@ -2,20 +2,17 @@
 
 namespace App\Http\Traits;
 
+use App\Models\UserToken;
 use Illuminate\Support\Str;
 
 trait TokenTrait
 {
-    use PermissionTrait;
-    public function createToken( $config){ //config-user,device
-       return $config['user']->tokens()->create([
-          'token' => Str::random(255),
-           'device' => $config['device']
-       ])->token;
-    }
-
-    public function newToken(){
-        //userToken ı günceller.
-        return "asd";
+    public function token($device,$user_id){
+        $token = UserToken::firstOrCreate(
+            ['user_id' => $user_id,],
+            ['token' => Str::random(255),
+            'device' => $device
+        ]);
+        return $token['token'];
     }
 }

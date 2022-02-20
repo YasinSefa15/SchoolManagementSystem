@@ -68,6 +68,20 @@ Route::controller(OfferedLectureController::class)->name('offeredlecture.')->pre
     Route::get('/view/{id}','view')->name('view'); // o kullanıcının alabileceği dersler listenmeli
 });  //->middleware('confirm')
 
+Route::controller(UserToLectureController::class)->name('user-to-lecture.')->prefix('user-to-lecture')->group(function () {
+    Route::get('/create', 'create')->name('create'); //approving demand
+    Route::get('/update', 'update')->name('update'); //updating status
+    Route::get('/delete', 'delete')->name('delete'); //dropping lecture
+});
+
+//gözden geçirilecek
+Route::controller(SupervisorController::class)->name('supervisor.')->prefix('supervisors')->group(function () {
+    Route::get('/create', 'create')->name('create');
+    Route::get('', 'read')->name('read');
+    Route::get('/update', 'update')->name('update');
+    Route::get('view/{id}', 'view')->name('view');
+});
+
 //user route u içerisinden yapıyoruz zaten bunu. Ve buradaki tüm işlemlere gerek yok en nihayetinde.
 Route::controller(UserTypeController::class)->name('user-type.')->prefix('user-type')->group(function () {
     Route::get('/create', 'create')->name('create');
@@ -76,21 +90,7 @@ Route::controller(UserTypeController::class)->name('user-type.')->prefix('user-t
     Route::get('view/{id}', 'view')->name('view');
 });
 
-//gözden geçirilecek
-Route::controller(SupervisorController::class)->name('supervisor.')->prefix('supervisors')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read');
-    Route::get('/update/{id}', 'update')->name('update');
-    Route::get('/delete/{id}', 'delete')->name('delete');
-    Route::get('view/{id}', 'view')->name('view');
-});
 
-
-Route::controller(UserToLectureController::class)->name('user-to-lecture.')->prefix('lecture/user')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('/update', 'update')->name('update');
-    Route::get('/delete', 'delete')->name('delete');
-});
 //??
 //Route::controller(UserToLectureController::class)->middleware('confirm')->name('user-to-lecture.')->prefix('user-to-lectures')->group(function () {
 //    Route::get('/create', 'create')->name('create');

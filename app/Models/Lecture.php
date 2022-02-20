@@ -24,20 +24,11 @@ class Lecture extends Model
         'semester'
     ];
 
-    public function details(){
-        return $this->hasOne(LectureDetail::class,'lecture_id','id');
-    }
-
-    public function usersToLecture(){
+    public function usersToLectures(){
         return $this->hasMany(UserToLecture::class,'lecture_id','id');
     }
     public function users(){
         return $this->hasManyThrough(User::class,UserToLecture::class,'lecture_id','id','id');
     }
-
-    public function lecturer(){
-        return $this->hasManyThrough(User::class,LectureDetail::class,'lecture_id','id','id');
-    }
-
 
 }

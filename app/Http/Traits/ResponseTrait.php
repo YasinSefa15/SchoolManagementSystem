@@ -18,13 +18,13 @@ trait ResponseTrait
 
     //cannot return 204x
     public function getCode($config,$type = null){
-        $config['code'] = 400;
+        //$config['code'] = 400;
         if (!isset($config['result']) || $config['result'] == null){
             unset($config['result']);
             $config['code'] = Response::HTTP_BAD_REQUEST;
             return $config;
         }
-        if ($type == 'read' || $type == 'view' || $type == 'update'){
+        if ($type == 'read' || $type == 'view' || $type == 'update' || $type == 'delete'){
             $config['code'] = Response::HTTP_OK;
         }elseif ($type == 'create'){
             $config['code'] = Response::HTTP_CREATED;
