@@ -71,7 +71,7 @@ class OfferedLectureController extends Controller
         ], 'update');
     }
 
-    /** todo : departman eşleşmesi yapıp görüntüleyecek */
+    /** todo : departman id-yıl-semester bilgisine göre görüntüleme yapılacak */
     public function read(Request $request){
         $result = DB::table('offered_lectures')
             ->where('start_at','<',now())

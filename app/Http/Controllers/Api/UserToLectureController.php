@@ -78,7 +78,8 @@ class UserToLectureController extends Controller
 
     public function delete(Request $request){
         $result = Lecture::where('id','=',$request->get('lecture_id'))->first();
-        if($result->usersToLectures()->where('user_id',$request->get('user_id'))->first() !== null){
+        if( $result != null &&
+            $result->usersToLectures()->where('user_id',$request->get('user_id'))->first() !== null){
             $rel = $result->usersToLectures()->first()->where('user_id',$request->get('user_id'))->first()->delete();
             $result->decrement('registered');
         }

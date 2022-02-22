@@ -18,4 +18,8 @@ class LectureToExam extends Model
       'percentage',
       'average_note'
     ];
+
+    public function grades(){
+        return $this->hasMany(UserToGrade::class,'exam_id','id');
+    }
 }

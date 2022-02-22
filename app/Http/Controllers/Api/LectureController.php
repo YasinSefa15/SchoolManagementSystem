@@ -106,7 +106,7 @@ class LectureController extends Controller
 
     /** todo : user lecture ilişkileri halledilince recheck */
     public function view(Request $request,$id){
-        $result = Lecture::with('users')->where('id',$id)->first();
+        $result = Lecture::with('users.grades','exams')->where('id',$id)->first();
 
         return $this->responseTrait([
                 'code' => null,

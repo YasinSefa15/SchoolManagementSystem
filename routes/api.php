@@ -7,7 +7,9 @@ use App\Http\Controllers\Api\LectureToExamController;
 use App\Http\Controllers\Api\OfferedLectureController;
 use App\Http\Controllers\Api\SupervisorController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserToGradeController;
 use App\Http\Controllers\Api\UserToLectureController;
+use App\Http\Controllers\Api\UserToLetterGradeController;
 use App\Http\Controllers\Api\UserTypeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Module\ModuleController;
@@ -57,7 +59,7 @@ Route::controller(LectureController::class)->name('lecture.')->prefix('lectures'
     Route::get('/create', 'create')->name('create');
     Route::get('', 'read')->name('read'); //sunulan dersler
     Route::get('/update/{id}', 'update')->name('update');
-    Route::get('view/{id}', 'view')->name('view');
+    Route::get('view/{id}', 'view')->name('view'); //hoca görüntüleyecek. Dersi alanlar, sınavlar
 });
 
 Route::controller(OfferedLectureController::class)->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
@@ -95,6 +97,18 @@ Route::controller(UserTypeController::class)->name('user-type.')->prefix('user-t
     Route::get('/update/{id}', 'update')->name('update');
     Route::get('/delete/{id}', 'delete')->name('delete');
     Route::get('view/{id}', 'view')->name('view');
+});
+
+Route::controller(UserToGradeController::class)->name('user-to-grade.')->prefix('user-to-grade')->group(function () {
+    Route::get('/create', 'create')->name('create'); //kullanıcıya not girişi yapılır
+    Route::get('/update', 'update')->name('update'); //kullanıcının notu düzenler
+//    Route::get('/delete/{id}', 'delete')->name('delete'); kullanılmadı
+//    Route::get('view/{id}', 'view')->name('view');
+});
+
+Route::controller(UserToLetterGradeController::class)->name('letter-grade.')->prefix('letter-grade')->group(function () {
+    Route::get('/create', 'create')->name('create');
+    Route::get('/update', 'update')->name('update');
 });
 
 

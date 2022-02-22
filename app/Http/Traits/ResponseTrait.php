@@ -13,7 +13,7 @@ trait ResponseTrait
             'code' => $config['code'],
             'message' => $config['message']
         ]);
-        return response()->json([$config],$config['code']);
+        return response()->json($config,$config['code']);
     }
 
     //cannot return 204x
