@@ -18,14 +18,14 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('department_id');
             $table->foreign('department_id')->references('id')->on('departments');
-            $table->string('code');
+            $table->tinyText('code');
             $table->unsignedBigInteger('lecturer_id');
             $table->foreign('lecturer_id')->references('id')->on('users');
             $table->integer('credit');
             $table->integer('registered')->default('0');
-            $table->integer('quota');
+            $table->smallInteger('quota');
             $table->json('date');
-            $table->integer('year');
+            $table->smallInteger('year');
             $table->enum('semester',['fall','spring']);
 
         });

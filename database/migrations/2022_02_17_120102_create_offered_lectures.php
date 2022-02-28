@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('offered_lectures', function (Blueprint $table) {
-            $table->integer('year');
+            $table->smallInteger('year');
             $table->enum('semester',['spring','fall']);
-            $table->enum('type',['semester','add-drop']);
+            $table->enum('type',['semester','add-drop'])->default('semester');
             $table->dateTime('start_at')->nullable();//Y-M-D H:M:S
             $table->dateTime('end_at')->nullable();//Y-M-D H:M:S
         });

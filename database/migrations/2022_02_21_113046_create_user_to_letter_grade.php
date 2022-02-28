@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('user_to_letter_grade', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->unsignedBigInteger('lecture'); /** todo : lecture_id olacak */
-            $table->foreign('lecture')->references('id')->on('lectures');
+            $table->unsignedBigInteger('lecture_id');
+            $table->foreign('lecture_id')->references('id')->on('lectures');
             $table->enum('letter_grade',['AA','BA','BB','CB','CC','DC','DD','FD','FF','DZ']);
         });
     }

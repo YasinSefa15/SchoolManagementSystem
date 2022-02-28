@@ -11,9 +11,9 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up() //keeps supervisors
     {
-        Schema::create('lecture_to_supervisor', function (Blueprint $table) {
+        Schema::create('lecturer_to_supervisor', function (Blueprint $table) {
             $table->unsignedBigInteger('lecturer_id');
             $table->foreign('lecturer_id')->references('id')->on('users');
             $table->unsignedBigInteger('department_id');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lecture_to_supervisor');
+        Schema::dropIfExists('lecturer_to_supervisor');
     }
 };

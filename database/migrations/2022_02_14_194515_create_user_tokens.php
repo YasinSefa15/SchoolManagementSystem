@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('user_tokens', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('token');
+            $table->string('token',64)->unique();
             $table->enum('device',['mobile','desktop','web','other']);
         });
     }

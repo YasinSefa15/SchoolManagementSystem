@@ -18,8 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('lecture_id');
             $table->foreign('lecture_id')->references('id')->on('lectures');
             $table->tinyText('type');
-            $table->integer('percentage');
-            $table->integer('average_note')->nullable();
+            $table->tinyInteger('percentage');
+            $table->tinyInteger('average_note')->nullable();
         });
     }
 

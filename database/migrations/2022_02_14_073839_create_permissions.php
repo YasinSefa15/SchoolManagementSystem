@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('module_route_id');
-            $table->foreign('module_route_id')->references('id')->on('modules_routes');
+            $table->foreign('module_route_id')->references('id')->on('module_to_routes');
         });
     }
 

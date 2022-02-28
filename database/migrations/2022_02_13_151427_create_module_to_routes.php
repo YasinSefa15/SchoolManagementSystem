@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('modules_routes', function (Blueprint $table) {
+        Schema::create('module_to_routes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('module_id');
             $table->foreign('module_id')->references('id')->on('modules');
-            $table->string('route_name')->unique();
-            $table->string('title');
-            $table->string('type');
+            $table->tinyText('route_name')->unique();
+            $table->tinyText('title');
+            $table->tinyText('type');
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('modules_routes');
+        Schema::dropIfExists('module_to_routes');
     }
 };
