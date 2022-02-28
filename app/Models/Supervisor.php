@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Supervisor extends Model
 {
     use HasFactory;
-/** todo : tablo adı yanlış. lecturers_to_supervisior olacak. */
 
-    protected $primaryKey = false;
-    protected $table = 'lecture_to_supervisor';
+    protected $table = 'lecturer_to_supervisor';
+    protected $primaryKey = null;
+    public $incrementing = false;
     public $timestamps = false;
     protected $fillable = [
         'lecturer_id',

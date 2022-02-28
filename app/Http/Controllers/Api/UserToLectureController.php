@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Traits\APIMessage;
 use App\Http\Traits\ResponseTrait;
 use App\Models\Lecture;
-use App\Models\LectureDetail;
 use App\Models\UserToLecture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserToLectureController extends Controller
@@ -41,35 +40,38 @@ class UserToLectureController extends Controller
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
-            'result' => $result,
+            'result' => $result ?? null,
         ], 'create');
-    }
-
-    //ders harf notuyla beraer dönülmeli. //review edilmedi
-    public function view(Request $request,$user_id){
-        $result = DB::table('user_to_lectures')->where('user_id','=',$user_id)->first();
-        $this->responseTrait([
-            'code' => null,
-            'message' => $request->route()->getName(),
-            'result' => $result
-        ], 'read');
     }
 
     //dersi onaylama işlemi
     public function update(Request $request){
-        $validator = Validator::make($request->all(),['status' => 'required|in:approved,pending,rejected']);
+        $lecture_id = $request->get('lecture_id');
+        $rules = [
+            'lecture_id' => 'required|integer',
+            'user_id' =>
+            [
+                'required',
+                Rule::exists('user_to_lectures')
+                    ->where(function ($query) use ($lecture_id) {
+                        $query->where('lecture_id', $lecture_id);
+                    })
+            ],
+            'status' => 'required|in:approved,pending,rejected'
+        ];
+        $validator = Validator::make($request->all(),$rules,$messages = ["exists" => "No match found."]);
         if ($validator->fails()){
-            return response()->json($this->APIMessage([
+            return $this->responseTrait([
                 'code' => 400,
-                'message' => "Lütfen formunuzu kontrol ediniz.",
+                'message' => 'Lütfen formunuzu kontrol ediniz.',
                 'result' => $validator->errors()
-            ]),Response::HTTP_BAD_REQUEST);
+            ]);
         }
         $result = UserToLecture::where('user_id',$request->get('user_id'))
             ->where('lecture_id',$request->get('lecture_id'))
             ->first()->update(['status' => 'approved']);
 
-        $this->responseTrait([
+        return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
             'result' => $result
@@ -80,8 +82,8 @@ class UserToLectureController extends Controller
         $result = Lecture::where('id','=',$request->get('lecture_id'))->first();
         if( $result != null &&
             $result->usersToLectures()->where('user_id',$request->get('user_id'))->first() !== null){
-            $rel = $result->usersToLectures()->first()->where('user_id',$request->get('user_id'))->first()->delete();
-            $result->decrement('registered');
+                $rel = $result->usersToLectures()->first()->where('user_id',$request->get('user_id'))->first()->delete();
+                $result->decrement('registered');
         }
         return $this->responseTrait([
             'code' => null,

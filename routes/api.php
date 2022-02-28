@@ -29,10 +29,6 @@ Route::get('login',[LoginController::class,'read'])->name('user.login');
 
 Route::controller(ModuleController::class)->name('module.')->prefix('modules')->group(function () {
     Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read');
-    Route::get('/update/{id}', 'update')->name('update');
-    Route::get('/delete/{id}', 'delete')->name('delete');
-    Route::get('/{id}', 'view')->name('view');
 });
 
 Route::controller(UserController::class)->name('user.')->prefix('users')->group(function () {
@@ -54,7 +50,7 @@ Route::controller(DepartmentController::class)->name('department.')->prefix('dep
     Route::get('/update/{id}', 'update')->name('update');
     Route::get('view/{id}', 'view')->name('view');
 });
-//->middleware('confirm')
+
 Route::controller(LectureController::class)->name('lecture.')->prefix('lectures')->group(function () {
     Route::get('/create', 'create')->name('create');
     Route::get('', 'read')->name('read'); //sunulan dersler
@@ -63,12 +59,14 @@ Route::controller(LectureController::class)->name('lecture.')->prefix('lectures'
 });
 
 Route::controller(OfferedLectureController::class)->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
-    Route::get('/create', 'create')->name('create'); //kullanmadım şimdilik
+    Route::get('/create', 'create')->name('create');
     Route::get('', 'read')->name('read');
     Route::get('/update', 'update')->name('update');
-    Route::get('/view/{id}','view')->name('view'); // o kullanıcının alabileceği dersler listenmeli
+    Route::get('/show','show')->name('show'); // o kullanıcının alabileceği dersler listenmeli
+    Route::get('/view/{id}','view')->name('view'); // o kullanıcının onaya gönderdiği dersler
 });  //->middleware('confirm')
 
+//kullanıcının aldığı dersleri göstersin
 Route::controller(UserToLectureController::class)->name('user-to-lecture.')->prefix('user-to-lecture')->group(function () {
     Route::get('/create', 'create')->name('create'); //approving demand
     Route::get('/update', 'update')->name('update'); //updating status

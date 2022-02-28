@@ -66,7 +66,7 @@ class DepartmentController extends Controller
     }
 
     public function view(Request $request,$id){
-        $result = Department::with('lectures')->where('id',$id)->first();
+        $result = Department::with('lectures','lecturers')->where('id',$id)->first();
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),

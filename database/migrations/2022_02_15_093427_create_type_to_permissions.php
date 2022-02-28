@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('type_to_permissions', function (Blueprint $table) {
             $table->unsignedBigInteger('type_id');
             $table->foreign('type_id')->references('id')->on('user_types');
-            $table->unsignedBigInteger('modules_routs_id');
-            $table->foreign('modules_routes_id')->references('id')->on('modules_routes');
+            $table->unsignedBigInteger('module_to_route_id');
+            $table->foreign('module_to_route_id')->references('id')->on('module_to_routes');
             $table->enum('type',['personal','general']);
         });
     }

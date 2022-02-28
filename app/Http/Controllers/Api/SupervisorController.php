@@ -17,11 +17,10 @@ class SupervisorController extends Controller
     use ResponseTrait;
     public function create(Request $request){
         $rules = [
-            'department_id' => 'required|integer|exists:departments,department_id',
+            'department_id' => 'required|integer|exists:departments,id',
             'lecturer_id' => 'required|integer|exists:user_to_type,user_id,type,lecturer'
         ];
         $validator = Validator::make($request->all(),$rules);
-
         if($validator->fails()){
             return $this->responseTrait([
                 'code' => 400,
@@ -30,7 +29,7 @@ class SupervisorController extends Controller
             ]);
         }
         $result = Supervisor::create([
-            'student_id' => $request->get('student_id'),
+            'department_id' => $request->get('department_id'),
             'lecturer_id' => $request->get('lecturer_id')
         ]);
         return $this->responseTrait([

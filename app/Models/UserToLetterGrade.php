@@ -17,7 +17,7 @@ class UserToLetterGrade extends Model
 
     protected $fillable = [
       'user_id',
-      'lecture',
+      'lecture_id',
       'letter_grade'
     ];
 }

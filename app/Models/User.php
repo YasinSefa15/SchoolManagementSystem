@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -25,22 +26,17 @@ class User extends Authenticatable
         'identification',
         'number'
     ];
-
-
     protected $hidden = [
         'password',
-        'email_verified_at',
-        'remember_token',
         'identification'
     ];
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+
+    public function setPasswordAttribute($password){
+        $this->attributes ['password'] = bcrypt($password);
+    }
+    public function setIdentificationAttribute($password){
+        $this->attributes ['identification'] = bcrypt($password);
+    }
 
     public function supervisior(){
         return $this->hasOne(StudentToSupervisior::class,'student_id','id');

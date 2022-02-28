@@ -3,21 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Traits\APIMessage;
-use App\Http\Traits\PermissionTrait;
 use App\Http\Traits\ResponseTrait;
-use App\Http\Traits\TokenTrait;
 use App\Models\Supervisor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
-    use APIMessage, TokenTrait, ResponseTrait;
+    use ResponseTrait;
     public function create(Request $request){
         $rules = [
             'name' => 'required|string',
@@ -35,12 +31,11 @@ class UserController extends Controller
                 'result' => $validator->errors()
             ]);
         }
-        $supervisior = Supervisor::where('department_id',$request->get('department_id'))->get()->random(1)->first();
         $result = User::create([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
-            'password' => Hash::make(substr($request->get('identification'),-6)), //5 ti
-            'identification' => Hash::make($request->get('identification')),
+            'password' => substr($request->get('identification'),-6), //5 ti
+            'identification' => $request->get('identification'),
             'number' => $request->get('type') == 'student' ? 'o'.$request->get('number') : 'h'.$request->get('number')
         ]);
         $type = DB::table('user_types')->where('type',$request->get('type'))->first();
@@ -51,9 +46,12 @@ class UserController extends Controller
         $result->userToDepartment()->create([
            'department_id' => $request->get('department_id')
         ]);
-        $request->get('type') != 'student' ? : $result->supervisior()->create([
-            'lecturer_id' => $supervisior->lecturer_id
-        ]);
+        if ($request->get('type') == 'student'){
+            $supervisior = Supervisor::where('department_id',$request->get('department_id'))->get()->random(1)->first();
+            $result->supervisior()->create([
+                'lecturer_id' => $supervisior->lecturer_id
+            ]);
+        }
 //        $this->createToken([
 //            'user' => $result,
 //            'device' => 'web'
@@ -68,11 +66,19 @@ class UserController extends Controller
 
     public function read(Request $request){
         /** todo : hepsinin type aynı geliyor*/
-        $result = User::get()->each(function($user){
-                $user->{'type'} = $user->types->first()->type;
-                unset($user->types);
-            return true;
-        });
+//        $result = User::get()->each(function($user){
+//                $user->{'type'} = $user->types->first()->type;
+//                unset($user->types);
+//            return true;
+//        });
+        /** todo : users dan gelen parametreye göre islem */
+        $department_id = $request->get('department_id');
+        $result = DB::table('users')
+            ->join('user_to_type','users.id','=','user_to_type.user_id')
+            ->when($department_id, function ($query,$department_id){
+                $query->where('department_id',$department_id);
+        })
+            ->get();
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),

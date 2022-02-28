@@ -61,13 +61,15 @@ class FacultyController extends Controller
         ], 'update');
     }
 
-//    public function view(Request $request,$id){
-//        $result = Faculty::with('departments')->where('id',$id)->first();
-//
-//        return $this->responseTrait([
-//            'code' => null,
-//            'message' => $request->route()->getName(),
-//            'result' => $result
-//        ], 'read');
-//    }
+    public function view(Request $request,$id){
+        $result = Faculty::with('departments','departments.lectures','departments.lecturers')
+            ->where('id',$id)
+            ->first();
+
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'read');
+    }
 }

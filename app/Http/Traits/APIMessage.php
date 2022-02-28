@@ -15,7 +15,7 @@ trait APIMessage
     }
 
     private function codes(array $config){
-        $title = DB::table('modules_routes')->where('route_name',$config['message'])->first();
+        $title = DB::table('module_to_routes')->where('route_name',$config['message'])->first();
         if($title){
             $message = $title->title . " ".( $config['code'] != 400 ? "işlemi başarılı" : "işlemi başarısız");
         }

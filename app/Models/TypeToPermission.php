@@ -12,8 +12,9 @@ class TypeToPermission extends Model
     public $timestamps = false;
 
     protected $fillable = [
-      'type_id',
-      'modules_routes_id'
+        'type_id',
+        'module_to_route_id',
+        'type'
     ];
 
     public function route(){

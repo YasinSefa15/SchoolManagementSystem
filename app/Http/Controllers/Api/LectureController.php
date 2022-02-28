@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Traits\APIMessage;
 use App\Http\Traits\ResponseTrait;
 use App\Models\Lecture;
 use Illuminate\Http\Request;
@@ -11,12 +10,11 @@ use Illuminate\Support\Facades\Validator;
 
 class LectureController extends Controller
 {
-    use APIMessage, ResponseTrait;
-    /** todo : hawali */
+    use ResponseTrait;
     public function create(Request $request){
         $rules = [
             'name' => 'required|string',
-            'year' => 'required|integer',
+            'year' => 'required|string',
             'department_id' => 'required|integer|exists:departments,id',
             'semester' => 'required|in:fall,spring',
             'code' => 'required|string',
@@ -55,7 +53,7 @@ class LectureController extends Controller
     }
 
     public function read(Request $request){
-        $validator = Validator::make($request->all(),['year'=> 'required|integer', 'semester' => 'required|in:spring,fall']);
+        $validator = Validator::make($request->all(),['year'=> 'required|string', 'semester' => 'required|in:spring,fall']);
 
         if ($validator->fails()){
             return $this->responseTrait([

@@ -24,7 +24,7 @@ class OfferedLectureController extends Controller
         $rules = [
             'start_at' => 'required|date_format:Y-m-d H:i',
             'end_at' => 'required|date_format:Y-m-d H:i',
-            'year' => 'required|date_format:Y',
+            'year' => 'required|string',
             'semester' => 'required|in:fall,spring',
             'type' => 'required|in:semester,add-drop',
         ];
@@ -36,6 +36,7 @@ class OfferedLectureController extends Controller
                 'result' => $validator->errors()
             ]);
         }
+
         $result = OfferedLecture::create($request->all());
         return $this->responseTrait([
             'code' => null,
@@ -47,7 +48,7 @@ class OfferedLectureController extends Controller
         $rules = [
             'start_at' => 'nullable|date_format:Y-m-d H:i',
             'end_at' => 'nullable|date_format:Y-m-d H:i',
-            'year' => 'required|date_format:Y',
+            'year' => 'required|string',
             'semester' => 'required|in:fall,spring',
             'type' => 'required|in:semester,add-drop'
         ];
@@ -60,7 +61,8 @@ class OfferedLectureController extends Controller
             ]);
         }
         /** todo: utc ile tutmasını sağla-tr saati ile tutuyo */
-        $result = OfferedLecture::where('year',$request->get('year'))
+        $result = OfferedLecture::query()
+            ->where('year',$request->get('year'))
             ->where('semester',$request->get('semester'))
             ->where('type',$request->get('type'))
             ->update($request->all());
@@ -71,8 +73,21 @@ class OfferedLectureController extends Controller
         ], 'update');
     }
 
-    /** todo : departman id-yıl-semester bilgisine göre görüntüleme yapılacak */
-    public function read(Request $request){
+
+    public function read(Request $request){ //o departmana açılan tüm dersler
+        $result = Lecture::query()
+            ->where('department_id',$request->get('department_id'))
+            ->where('year',$request->get('year'))
+            ->get();
+
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'read');
+    }
+
+    public function show(Request $request){ //kullanıcının seçebileceği dersler
         $result = DB::table('offered_lectures')
             ->where('start_at','<',now())
             ->where('end_at','>',now())

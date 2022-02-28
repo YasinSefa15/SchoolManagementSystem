@@ -9,6 +9,7 @@ class Module extends Model
 {
     use HasFactory;
 
+    public $timestamps =  false;
     protected $fillable = [
       'title',
       'name',

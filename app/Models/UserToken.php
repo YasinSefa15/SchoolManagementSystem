@@ -11,6 +11,8 @@ class UserToken extends Model
 
     protected $table = 'user_tokens';
 
+    protected $primaryKey = null;
+    public $incrementing = false;
     public $timestamps = false;
     protected $fillable = [
         'user_id',

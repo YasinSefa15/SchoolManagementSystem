@@ -9,8 +9,9 @@ class StudentToSupervisior extends Model
 {
     use HasFactory;
     protected $primaryKey = null;
+    public $incrementing = false;
     public $timestamps = false;
-    protected $table = 'student_to_supervisior';
+    protected $table = 'student_to_supervisor';
     protected $fillable = [
         'lecturer_id',
         'student_id'

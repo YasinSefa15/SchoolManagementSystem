@@ -9,7 +9,7 @@ class ModuleRoute extends Model
 {
     use HasFactory;
 
-    protected $table = 'modules_routes';
+    protected $table = 'module_to_routes';
 
     protected $fillable = [
         'module_id',

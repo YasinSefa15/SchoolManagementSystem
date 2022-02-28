@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('module_id');
             $table->foreign('module_id')->references('id')->on('modules');
-            $table->tinyText('route_name')->unique();
+            $table->string('route_name',32)->unique();
             $table->tinyText('title');
             $table->tinyText('type');
             $table->timestamps();

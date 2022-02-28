@@ -25,9 +25,8 @@ return new class extends Migration
             $table->integer('registered')->default('0');
             $table->smallInteger('quota');
             $table->json('date');
-            $table->smallInteger('year');
+            $table->string('year',16); //2020-2021
             $table->enum('semester',['fall','spring']);
-
         });
     }
 
