@@ -12,7 +12,7 @@ trait ResponseTrait
         $config['message'] = $this->APIMessage([
             'code' => $config['code'],
             'message' => $config['message']
-        ]);
+        ],$type);
         return response()->json($config,$config['code']);
     }
 

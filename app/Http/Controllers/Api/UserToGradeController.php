@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ResponseTrait;
 use App\Models\LectureToExam;
-use App\Models\UserToGrade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -34,9 +33,8 @@ class UserToGradeController extends Controller
         $model->update([
             'average_note' => ($model->average_note *$model->grades()->count() + $request->get('grade')) / ($model->grades()->count()+1)
             ]) ;
-
         $result = $model->grades()->create([
-           'user_id' => $request->get('user_id'),
+            'user_id' => $request->get('user_id'),
             'grade' => $request->get('grade')
         ]);
 

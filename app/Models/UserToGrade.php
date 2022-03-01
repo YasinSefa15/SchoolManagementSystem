@@ -9,6 +9,7 @@ class UserToGrade extends Model
 {
     use HasFactory;
     protected $primaryKey = null;
+    public $incrementing = false;
     public $timestamps = false;
     protected $table = 'user_to_grades';
 

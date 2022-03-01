@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,6 +24,7 @@ class OfferedLecture extends Model
         'start_at',
         'end_at'
     ];
+
 
     public function lectures(){
         return $this->hasMany(Lecture::class,'year','year');

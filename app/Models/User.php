@@ -54,9 +54,12 @@ class User extends Authenticatable
         return $this->hasMany(UserToken::class);
     }
 
-    //lecture-view deneme
     public function grades(){
         return $this->hasMany(UserToGrade::class);
+    }
+
+    public function letter(){
+        return $this->hasMany(UserToLetterGrade::class,'user_id','id');
     }
 
 }

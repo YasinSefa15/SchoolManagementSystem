@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Traits\APIMessage;
 use App\Http\Traits\ResponseTrait;
 use App\Models\Department;
 use App\Models\StudentToSupervisior;
 use App\Models\Supervisor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 
 class SupervisorController extends Controller
 {
@@ -49,7 +47,6 @@ class SupervisorController extends Controller
         ], 'read');
     }
 
-    /** todo : student_to_supervisior tablo adı yanlış. ..._supervisor olacak */
     public function update(Request $request){
         $rules = [
             'student_id' => 'required|integer|exists:student_to_supervisior,student_id',

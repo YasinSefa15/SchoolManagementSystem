@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\UserToLetterGradeController;
 use App\Http\Controllers\Api\UserTypeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Module\ModuleController;
+use App\Http\Controllers\NoteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,6 +58,8 @@ Route::controller(LectureController::class)->name('lecture.')->prefix('lectures'
     Route::get('/update/{id}', 'update')->name('update');
     Route::get('view/{id}', 'view')->name('view'); //hoca görüntüleyecek. Dersi alanlar, sınavlar
 });
+
+Route::get('/users/{id}/note',[NoteController::class,'read'])->name('note.read');
 
 Route::controller(OfferedLectureController::class)->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
     Route::get('/create', 'create')->name('create');

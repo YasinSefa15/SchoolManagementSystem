@@ -7,13 +7,11 @@ use App\Http\Traits\APIMessage;
 use App\Http\Traits\ResponseTrait;
 use App\Models\Lecture;
 use App\Models\OfferedLecture;
-use App\Models\User;
-use App\Models\UserToLecture;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
+use function now;
 
 
 class OfferedLectureController extends Controller
@@ -37,7 +35,13 @@ class OfferedLectureController extends Controller
             ]);
         }
 
-        $result = OfferedLecture::create($request->all());
+        $result = OfferedLecture::create([
+            'start_at' => Carbon::parse($request->get('start_at'))->subHour(3),
+            'end_at' => Carbon::parse($request->get('end_at'))->subHour(3),
+            'year' => $request->get('year'),
+            'semester' => $request->get('semester'),
+            'type' => $request->get('type')
+        ]);
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
@@ -60,12 +64,21 @@ class OfferedLectureController extends Controller
                 'result' => $validator->errors()
             ]);
         }
-        /** todo: utc ile tutmasını sağla-tr saati ile tutuyo */
-        $result = OfferedLecture::query()
-            ->where('year',$request->get('year'))
+
+        $result = OfferedLecture::
+            where('year',$request->get('year'))
             ->where('semester',$request->get('semester'))
             ->where('type',$request->get('type'))
-            ->update($request->all());
+            ->first();
+
+//        $result = $result->when($request->get('start_at') , function ($result) use($request){
+//            $result->update(['start_at' => $request->get('start_at')]);
+//        });
+        $result == null ? : $result->update([
+                'start_at' => $request->get('start_at') ? Carbon::parse($request->get('start_at'))->subHour(3) : $result->start_at,
+                'end_at' => $request->get('end_at') ? Carbon::parse($request->get('end_at'))->subHour(3) : $result->end_at
+            ]);
+
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),

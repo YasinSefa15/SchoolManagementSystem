@@ -8,7 +8,6 @@ use App\Models\Supervisor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -52,10 +51,7 @@ class UserController extends Controller
                 'lecturer_id' => $supervisior->lecturer_id
             ]);
         }
-//        $this->createToken([
-//            'user' => $result,
-//            'device' => 'web'
-//        ]);
+
         $result->type = $request->get('type');
         return $this->responseTrait([
             'code' => null,
@@ -65,13 +61,7 @@ class UserController extends Controller
     }
 
     public function read(Request $request){
-        /** todo : hepsinin type aynı geliyor*/
-//        $result = User::get()->each(function($user){
-//                $user->{'type'} = $user->types->first()->type;
-//                unset($user->types);
-//            return true;
-//        });
-        /** todo : users dan gelen parametreye göre islem */
+        /** todo : users dan gelen parametreye göre islem yapılması gerekebilir*/
         $department_id = $request->get('department_id');
         $result = DB::table('users')
             ->join('user_to_type','users.id','=','user_to_type.user_id')
@@ -106,7 +96,7 @@ class UserController extends Controller
         $result == null ? : $result->update([
            'name' => $request->get('name') ?? $result->name,
            'email' => $request->get('email') ?? $result->email,
-           'password' => $request->get('password') ? Hash::make($request->get('password')) :  $result->password
+           'password' => $request->get('password') ??  $result->password
         ]);
         if($request->get('type') !== null) {
             $type = DB::table('user_types')->where('type',$request->get('type'))->first();

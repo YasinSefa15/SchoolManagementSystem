@@ -7,10 +7,8 @@ use App\Http\Traits\ResponseTrait;
 use App\Models\Lecture;
 use App\Models\UserToLecture;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Symfony\Component\HttpFoundation\Response;
 
 class UserToLectureController extends Controller
 {

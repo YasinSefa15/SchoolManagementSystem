@@ -7,6 +7,7 @@ use App\Http\Traits\ResponseTrait;
 use App\Models\Lecture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use function dd;
 
 class LectureController extends Controller
 {
@@ -25,7 +26,6 @@ class LectureController extends Controller
         ];
 
         $validator = Validator::make($request->all(),$rules);
-
         if($validator->fails()){
             return $this->responseTrait([
                 'code' => 400,
@@ -40,7 +40,7 @@ class LectureController extends Controller
             'lecturer_id' => $request->get('lecturer_id'),
             'credit' => $request->get('credit'),
             'quota' => $request->get('quota'),
-            'date' => json_encode($request->get('date')),
+            'date' => $request->get('date'),
             'year' => $request->get('year'),
             'semester' => $request->get('semester'),
         ]);

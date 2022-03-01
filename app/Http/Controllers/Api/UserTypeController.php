@@ -9,6 +9,7 @@ use App\Models\UserType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
+use function response;
 
 class UserTypeController extends Controller
 {

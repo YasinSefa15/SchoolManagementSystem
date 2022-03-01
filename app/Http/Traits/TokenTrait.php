@@ -9,10 +9,10 @@ trait TokenTrait
 {
     public function token($device,$user_id){
         $token = UserToken::firstOrCreate(
-            ['user_id' => $user_id,],
-            ['token' => Str::random(255),
-            'device' => $device
-        ]);
+            ['user_id' => $user_id,
+            'device' => $device],
+            ['token' => Str::random(255)]
+        );
         return $token['token'];
     }
 }
