@@ -73,7 +73,7 @@ Route::controller(OfferedLectureController::class)->name('offeredlecture.')->pre
 Route::controller(UserToLectureController::class)->name('user-to-lecture.')->prefix('user-to-lecture')->group(function () {
     Route::get('/create', 'create')->name('create'); //approving demand
     Route::get('/update', 'update')->name('update'); //updating status
-    Route::get('/delete', 'delete')->name('delete'); //dropping lecture
+    Route::get('/read', 'read')->name('read'); //shows users lecture status for supervisors
 });
 
 //gözden geçirilecek

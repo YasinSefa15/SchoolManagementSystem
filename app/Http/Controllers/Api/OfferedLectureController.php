@@ -71,9 +71,6 @@ class OfferedLectureController extends Controller
             ->where('type',$request->get('type'))
             ->first();
 
-//        $result = $result->when($request->get('start_at') , function ($result) use($request){
-//            $result->update(['start_at' => $request->get('start_at')]);
-//        });
         $result == null ? : $result->update([
                 'start_at' => $request->get('start_at') ? Carbon::parse($request->get('start_at'))->subHour(3) : $result->start_at,
                 'end_at' => $request->get('end_at') ? Carbon::parse($request->get('end_at'))->subHour(3) : $result->end_at

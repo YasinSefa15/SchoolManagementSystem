@@ -7,8 +7,11 @@ use App\Http\Traits\ResponseTrait;
 use App\Models\Lecture;
 use App\Models\UserToLecture;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use function PHPUnit\Framework\isNan;
+use function PHPUnit\Framework\isNull;
 
 class UserToLectureController extends Controller
 {
@@ -42,22 +45,13 @@ class UserToLectureController extends Controller
         ], 'create');
     }
 
-    //dersi onaylama işlemi
     public function update(Request $request){
-        $lecture_id = $request->get('lecture_id');
         $rules = [
             'lecture_id' => 'required|integer',
-            'user_id' =>
-            [
-                'required',
-                Rule::exists('user_to_lectures')
-                    ->where(function ($query) use ($lecture_id) {
-                        $query->where('lecture_id', $lecture_id);
-                    })
-            ],
+            'user_id' => 'required|integer',
             'status' => 'required|in:approved,pending,rejected'
         ];
-        $validator = Validator::make($request->all(),$rules,$messages = ["exists" => "No match found."]);
+        $validator = Validator::make($request->all(),$rules);
         if ($validator->fails()){
             return $this->responseTrait([
                 'code' => 400,
@@ -65,29 +59,64 @@ class UserToLectureController extends Controller
                 'result' => $validator->errors()
             ]);
         }
+
         $result = UserToLecture::where('user_id',$request->get('user_id'))
-            ->where('lecture_id',$request->get('lecture_id'))
-            ->first()->update(['status' => 'approved']);
+            ->where('lecture_id',$request->get('lecture_id'));
 
-        return $this->responseTrait([
-            'code' => null,
-            'message' => $request->route()->getName(),
-            'result' => $result
-        ], 'read');
-    }
-
-    public function delete(Request $request){
-        $result = Lecture::where('id','=',$request->get('lecture_id'))->first();
-        if( $result != null &&
-            $result->usersToLectures()->where('user_id',$request->get('user_id'))->first() !== null){
-                $rel = $result->usersToLectures()->first()->where('user_id',$request->get('user_id'))->first()->delete();
-                $result->decrement('registered');
+        if (($result->first())){
+            if ($request->get('status') == 'rejected'){
+                $result->first()->lectures()->first()->decrement('registered');
+                $rel = $result->delete();
+            }else{
+                $rel = $result->first()->update(['status' => 'approved']);
+            }
         }
+
+
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
             'result' => (!isset($rel) ? null : $rel)
-        ], 'delete');
+        ], 'update');
+    }
+
+    public function read(Request $request){
+        $rules = [
+            'lecturer_id' => 'required|integer'
+        ];
+        $validator = Validator::make($request->all(),$rules);
+        if ($validator->fails()){
+            return $this->responseTrait([
+                'code' => 400,
+                'message' => 'Lütfen formunuzu kontrol ediniz.',
+                'result' => $validator->errors()
+            ]);
+        }
+            $result = DB::table('student_to_supervisor')
+                ->where('student_to_supervisor.lecturer_id','=',$request->get('lecturer_id'))
+                ->join('users', function ($join) {
+                    $join->on('users.id', '=', 'student_to_supervisor.student_id');
+                })
+                ->join('user_to_lectures', function ($join) {
+                    $join->on('user_to_lectures.user_id','=','users.id');
+                })
+                ->join('offered_lectures', function ($join) {
+                    $join ->where('start_at','<',now())
+                        ->where('end_at','>',now());
+                })
+                ->join('lectures', function ($join) {
+                    $join->on('lectures.semester','=','offered_lectures.semester')
+                        ->on('lectures.year','=','offered_lectures.year')
+                        ->on('lectures.id','=','user_to_lectures.lecture_id');
+                })
+                ->select('users.name as user_name','lectures.name as lecture_name','user_to_lectures.*','lectures.name','lectures.code')
+             ->get();
+
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result,
+        ], 'create');
     }
 
 }

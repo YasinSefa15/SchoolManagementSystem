@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserToLecture extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'user_id';
+    protected $primaryKey = null;
     public $incrementing = false;
 
     protected $table = 'user_to_lectures';
@@ -25,6 +25,10 @@ class UserToLecture extends Model
 
     public function lectures(){
         return $this->hasMany(Lecture::class,'id','lecture_id');
+    }
+
+    public function letterGrades(){
+        return $this->hasMany(UserToLetterGrade::class,'lecture_id','lecture_id');
     }
 
 }

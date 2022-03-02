@@ -61,7 +61,10 @@ class SupervisorController extends Controller
             ]);
         }
 
-        $result = StudentToSupervisior::where('student_id',$request->get('student_id'))->first();
+        $result = StudentToSupervisior::query()
+            ->where('student_id',$request->get('student_id'))
+            ->where('lecturer_id',$request->get('lecturer_id'))
+            ->first();
         $result == null ? : $result->update(['lecturer_id' => $request->get('lecturer_id')]);
 
         return $this->responseTrait([
