@@ -7,12 +7,19 @@ use Illuminate\Support\Str;
 
 trait TokenTrait
 {
-    public function token($device,$user_id){
-        $token = UserToken::firstOrCreate(
-            ['user_id' => $user_id,
-            'device' => $device],
-            ['token' => Str::random(255)]
-        );
-        return $token['token'];
+    public function token(array $config){
+        $newToken = Str::random(255);
+        $userToken = UserToken::where(
+            ['user_id' => $config['user_id'],
+            'device' => $config['device']])
+            ->update([
+                'token' => $newToken
+            ]);
+        $userToken ? : UserToken::create([
+            'user_id' => $config['user_id'],
+            'token' => $newToken,
+            'device' => $config['device']
+        ]);
+        return $newToken;
     }
 }

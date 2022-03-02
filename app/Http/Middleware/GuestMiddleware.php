@@ -4,10 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
-class DeviceMiddleware
+class GuestMiddleware
 {
     /**
      * Handle an incoming request.
@@ -18,14 +17,12 @@ class DeviceMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $deviceToken = DB::table('user_tokens')->where('device','=',$request->header('x-device'))->first();
-        if (isset($deviceToken)){
-            return $next($request);
+        if ($request->header('x-token')){
+            return response()->json([
+                "code" => Response::HTTP_FORBIDDEN,
+                "message" => "Yetkisiz işlem.",
+            ],Response::HTTP_FORBIDDEN);
         }
-
-        return response()->json([
-            "code" => Response::HTTP_UNAUTHORIZED,
-            "message" => "Cihaz doğrulaması yapın",
-        ],Response::HTTP_UNAUTHORIZED);
+        return $next($request);
     }
 }

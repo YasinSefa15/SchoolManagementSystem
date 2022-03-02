@@ -15,9 +15,13 @@ class LoginController extends Controller
     use TokenTrait, ResponseTrait;
     public function read(Request $request){
         $result = User::where('number',$request->get('number'))->first();
-        $token = $result == null ? : $this->token($request->header('x-device'),$result->id);
+        $available = $result !=null && Hash::check($request->get('password'),$result->password);
+        $token = $available == null ? : $this->token([
+            'device' => $request->header('x-device'),
+            'user_id' => $result->id
+        ]);
         $result['type'] = $result->types()->first()->type;
-        return ($result !=null && Hash::check($request->get('password'),$result->password)) ?
+        return ($available) ?
             $this->responseTrait([
                 'code' => null,
                 'message' => $request->route()->getName(),

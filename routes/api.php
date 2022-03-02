@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('login',[LoginController::class,'read'])->name('user.login');
+Route::get('login',[LoginController::class,'read'])->name('user.login')->middleware('guest');
 
 Route::controller(ModuleController::class)->name('module.')->prefix('modules')->group(function () {
     Route::get('/create', 'create')->name('create');
@@ -61,13 +61,13 @@ Route::controller(LectureController::class)->name('lecture.')->prefix('lectures'
 
 Route::get('/users/{id}/note',[NoteController::class,'read'])->name('note.read');
 
-Route::controller(OfferedLectureController::class)->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
+Route::controller(OfferedLectureController::class)->middleware('authenticated')->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
     Route::get('/create', 'create')->name('create');
     Route::get('', 'read')->name('read');
     Route::get('/update', 'update')->name('update');
     Route::get('/show','show')->name('show'); // o kullanıcının alabileceği dersler listenmeli
     Route::get('/view/{id}','view')->name('view'); // o kullanıcının onaya gönderdiği dersler
-});  //->middleware('confirm')
+});
 
 //kullanıcının aldığı dersleri göstersin
 Route::controller(UserToLectureController::class)->name('user-to-lecture.')->prefix('user-to-lecture')->group(function () {
