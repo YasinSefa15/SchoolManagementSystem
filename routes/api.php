@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\LectureController;
 use App\Http\Controllers\Api\LectureToExamController;
 use App\Http\Controllers\Api\OfferedLectureController;
+use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\StudentToSupervisorController;
 use App\Http\Controllers\Api\SupervisorController;
 use App\Http\Controllers\Api\UserController;
@@ -31,7 +32,17 @@ Route::get('login',[LoginController::class,'read'])
     ->middleware('guest')
     ->name('user.login');
 
-//permission ekleme çıkarma listeleme için route oluşturulacak. sadece admin erişebilir.
+Route::controller(PermissionController::class)
+    ->middleware('authenticated')
+    ->name('permission.')
+    ->prefix('permissions')
+    ->group(function () {
+        Route::get('', 'read')->name('read');
+        Route::get('/create', 'create')->name('create');
+        Route::get('/update', 'update')->name('update');
+        Route::get('/delete', 'delete')->name('delete');
+    });
+
 
 Route::controller(ModuleController::class)
     ->middleware('authenticated')
