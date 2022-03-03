@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\FacultyController;
 use App\Http\Controllers\Api\LectureController;
 use App\Http\Controllers\Api\LectureToExamController;
 use App\Http\Controllers\Api\OfferedLectureController;
+use App\Http\Controllers\Api\StudentToSupervisorController;
 use App\Http\Controllers\Api\SupervisorController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserToGradeController;
@@ -26,98 +27,142 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('login',[LoginController::class,'read'])->name('user.login')->middleware('guest');
+Route::get('login',[LoginController::class,'read'])
+    ->middleware('guest')
+    ->name('user.login');
 
-Route::controller(ModuleController::class)->name('module.')->prefix('modules')->group(function () {
-    Route::get('/create', 'create')->name('create');
+//permission ekleme çıkarma listeleme için route oluşturulacak. sadece admin erişebilir.
+
+Route::controller(ModuleController::class)
+    ->middleware('authenticated')
+    ->name('module.')
+    ->prefix('modules')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create');
 });
 
-Route::controller(UserController::class)->name('user.')->prefix('users')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read');
-    Route::get('/update/{id}', 'update')->name('update');
-    Route::get('view/{id}', 'view')->name('view');
+Route::controller(UserTypeController::class)
+    ->middleware('authenticated')
+    ->name('user-type.')
+    ->prefix('user-type')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create');
+        Route::get('', 'read')->name('read');
+        Route::get('/update/{id}', 'update')->name('update');
 });
 
-Route::controller(FacultyController::class)->name('faculty.')->prefix('faculties')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read');
-    Route::get('/update/{id}', 'update')->name('update');
-    Route::get('view/{id}', 'view')->name('view');
-});
-Route::controller(DepartmentController::class)->name('department.')->prefix('departments')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read');
-    Route::get('/update/{id}', 'update')->name('update');
-    Route::get('view/{id}', 'view')->name('view');
+Route::controller(UserController::class)
+    ->middleware('authenticated')
+    ->name('user.')
+    ->prefix('users')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create');
+        Route::get('', 'read')->name('read');
+        Route::get('/update/{id}', 'update')->name('update');
+        Route::get('view/{id}', 'view')->name('view');
 });
 
-Route::controller(LectureController::class)->name('lecture.')->prefix('lectures')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read'); //sunulan dersler
-    Route::get('/update/{id}', 'update')->name('update');
-    Route::get('view/{id}', 'view')->name('view'); //hoca görüntüleyecek. Dersi alanlar, sınavlar
+Route::controller(FacultyController::class)
+    ->middleware('authenticated')
+    ->name('faculty.')
+    ->prefix('faculties')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create');
+        Route::get('', 'read')->name('read');
+        Route::get('/update/{id}', 'update')->name('update');
+        Route::get('view/{id}', 'view')->name('view');
+});
+Route::controller(DepartmentController::class)
+    ->middleware('authenticated')
+    ->name('department.')
+    ->prefix('departments')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create');
+        Route::get('', 'read')->name('read');
+        Route::get('/update/{id}', 'update')->name('update');
+        Route::get('view/{id}', 'view')->name('view');
 });
 
-Route::get('/users/{id}/note',[NoteController::class,'read'])->name('note.read');
+Route::controller(SupervisorController::class)
+    ->middleware('authenticated')
+    ->name('supervisor.')
+    ->prefix('supervisors')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create');//creates supervisors
+        Route::get('', 'read')->name('read'); //read the given department_id supervisors
+        Route::get('/update', 'update')->name('update');
+        Route::get('view/{id}', 'view')->name('view');//supervisor with students
+});
 
-Route::controller(OfferedLectureController::class)->middleware('authenticated')->name('offeredlecture.')->prefix('lecture/offered')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read');
+Route::controller(StudentToSupervisorController::class)
+    ->middleware('authenticated')
+    ->name('user-to-supervisor.')
+    ->prefix('user-to-supervisor')
+    ->group(function () {
+        Route::get('', 'read')->name('read');
+        Route::get('/update', 'update')->name('update');//updating student's supervisor
+});
+
+Route::controller(OfferedLectureController::class)
+    ->middleware('authenticated')
+    ->name('offeredlecture.')
+    ->prefix('lectures-offered')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create'); //creates the rolling time of lectures
+        Route::get('', 'read')->name('read'); //lists the lectures' user can choose
+        Route::get('show', 'show')->name('show'); //lists the offered lectures in admin panel
+        Route::get('/update', 'update')->name('update'); //updates the rolling time of lectures
+        Route::get('/view/{id}','view')->name('view'); //lists the lectures' user chose
+});
+
+Route::controller(LectureController::class)
+    ->middleware('authenticated')
+    ->name('lecture.')
+    ->prefix('lectures')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create');
+        Route::get('', 'read')->name('read'); //lists the all offered lectures
+        Route::get('/update/{id}', 'update')->name('update');
+        Route::get('/{lecture_id}', 'view')->name('view');//lists exams-users for lecture for lecturers
+});
+
+Route::controller(LectureToExamController::class)
+    ->middleware('authenticated')
+    ->name('exam.')
+    ->prefix('lectures/{lecture_id}/exams')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create'); //creates exams
+        Route::get('/delete/{exam_id}', 'delete')->name('delete');
+        Route::get('', 'read')->name('read'); //lecturer sees all lectures belongs s/he
+        Route::get('/update/{exam_id}', 'update')->name('update'); //updates given exam_id exam
+});
+
+Route::controller(UserToLectureController::class)
+    ->middleware('authenticated')
+    ->name('user-to-lecture.')
+    ->prefix('user-to-lecture')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create'); //demanding lecture ++student can access
+        Route::get('/update/{lecture_id}', 'update')->name('update'); //updating status ++lecturer can access
+        Route::get('/read', 'read')->name('read'); //shows users lecture status for supervisors
+});
+
+Route::controller(UserToGradeController::class)
+    ->middleware('authenticated')
+    ->name('user-to-grade.')->prefix('user-to-grade')->group(function () {
+    Route::get('/create', 'create')->name('create'); //lecturer enters note to user
     Route::get('/update', 'update')->name('update');
-    Route::get('/show','show')->name('show'); // o kullanıcının alabileceği dersler listenmeli
-    Route::get('/view/{id}','view')->name('view'); // o kullanıcının onaya gönderdiği dersler
 });
 
-//kullanıcının aldığı dersleri göstersin
-Route::controller(UserToLectureController::class)->name('user-to-lecture.')->prefix('user-to-lecture')->group(function () {
-    Route::get('/create', 'create')->name('create'); //approving demand
-    Route::get('/update', 'update')->name('update'); //updating status
-    Route::get('/read', 'read')->name('read'); //shows users lecture status for supervisors
+Route::controller(UserToLetterGradeController::class)
+    ->middleware('authenticated')
+    ->name('letter-grade.')
+    ->prefix('letter-grade')
+    ->group(function () {
+        Route::get('/create', 'create')->name('create');
+        Route::get('/update', 'update')->name('update');
 });
 
-//gözden geçirilecek
-Route::controller(SupervisorController::class)->name('supervisor.')->prefix('supervisors')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('', 'read')->name('read');
-    Route::get('/update', 'update')->name('update');
-    Route::get('view/{id}', 'view')->name('view');
-});
-
-Route::controller(LectureToExamController::class)->name('lecture-to-exam.')->prefix('lecture-to-exam')->group(function () {
-    Route::get('/create', 'create')->name('create'); //sınav oluşturur
-    Route::get('/delete/{id}', 'delete')->name('delete'); //sınav siler
-    Route::get('{id}', 'read')->name('read'); //verilen hocaya ait tüm dersler sınavlarla birlikte gösterilir
-    Route::get('/update/{id}', 'update')->name('update'); //verilen id deli exami günceller
-    Route::get('view/{id}', 'view')->name('view'); //o dersin examlerini gösterir
-});
-
-//bazı routelar ileride kullanılmayabilir.
-Route::controller(UserTypeController::class)->name('user-type.')->prefix('user-type')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('/update/{id}', 'update')->name('update');
-    Route::get('/delete/{id}', 'delete')->name('delete');
-    Route::get('view/{id}', 'view')->name('view');
-});
-
-Route::controller(UserToGradeController::class)->name('user-to-grade.')->prefix('user-to-grade')->group(function () {
-    Route::get('/create', 'create')->name('create'); //kullanıcıya not girişi yapılır
-    Route::get('/update', 'update')->name('update'); //kullanıcının notu düzenler
-//    Route::get('/delete/{id}', 'delete')->name('delete'); kullanılmadı
-//    Route::get('view/{id}', 'view')->name('view');
-});
-
-Route::controller(UserToLetterGradeController::class)->name('letter-grade.')->prefix('letter-grade')->group(function () {
-    Route::get('/create', 'create')->name('create');
-    Route::get('/update', 'update')->name('update');
-});
-
-
-//??
-//Route::controller(UserToLectureController::class)->middleware('confirm')->name('user-to-lecture.')->prefix('user-to-lectures')->group(function () {
-//    Route::get('/create', 'create')->name('create');
-//    Route::get('view/{user_id}', 'view')->name('view');
-//    Route::get('/delete/lecture/{lecture_id}/user/{user_id}', 'delete')->name('delete');
-//    Route::get('/update/lecture/{lecture_id}/user/{user_id}', 'update')->name('update');
-//});
-
+Route::get('/users/{user_id}/note',[NoteController::class,'read'])
+    ->middleware('authenticated')
+    ->name('note.read');

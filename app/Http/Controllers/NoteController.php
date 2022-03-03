@@ -3,19 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Traits\ResponseTrait;
-use App\Models\Lecture;
-use App\Models\UserToGrade;
 use App\Models\UserToLecture;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class NoteController extends Controller
 {
     use ResponseTrait;
-    //Kullanıcı not görüntüleme sayfası
-    //Transkript görüntüleme
-
     public function read(Request $request,$id){
         $year = $request->get('year');
         $semester = $request->get('semester');

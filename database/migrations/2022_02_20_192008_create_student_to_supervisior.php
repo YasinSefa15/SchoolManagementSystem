@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('student_to_supervisor', function (Blueprint $table) {
-            $table->unsignedBigInteger('lecturer_id');
+            $table->unsignedBigInteger('lecturer_id')->nullable();
             $table->foreign('lecturer_id')->references('id')->on('users');
             $table->unsignedBigInteger('student_id');
             $table->foreign('student_id')->references('id')->on('users');

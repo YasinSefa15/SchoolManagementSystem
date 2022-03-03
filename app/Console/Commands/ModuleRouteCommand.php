@@ -54,19 +54,25 @@ class ModuleRouteCommand extends Command
     }
 
     public function createOrPass($route,$module){
+        $operation = $this->getOperation(Str::after($route,'.'));
         if (Str::before($route,'.') == Str::lower($module->name)){
-            $operation = $this->getOperation(Str::after($route,'.'));
             ModuleRoute::updateOrCreate(
               ['route_name' => $route],
               ['module_id' => $module->id, 'title' => $module->title . " " . $operation, 'type' => Str::after($route,'.')]
             );
-        }elseif(Str::between($route,'to-','.') == Str::lower($module->name)){
-            $operation = $this->getOperation(Str::after($route,'.'));
-            $relTitle = DB::table('modules')->where('name',Str::ucfirst(Str::before($route,'-to')))->first()->title;
-            $title = $module->title . " " . $relTitle . " ilişkisi " . $operation;
+        }elseif(Str::between($route,'to-','.') === Str::lower(Str::after($module->name,'-'))
+        && Str::before($route,'-to') === Str::lower(Str::before($module->name,'-'))){
+            $relTitle = DB::table('modules')->where('name',Str::ucfirst(Str::before($module->name,'-to')))->first()->title;
+            $title = $relTitle . " ilişkisi " . $operation;
             ModuleRoute::updateOrCreate(
                 ['route_name' => $route],
                 ['module_id' => $module->id, 'title' => $title, 'type' => Str::after($route,'.')]
+            );
+        }elseif (Str::contains($route,'-') && !Str::contains($route,'to-')
+                && (Str::lower(Str::camel(Str::before($route,'.'))) == Str::lower($module->name))){
+            ModuleRoute::updateOrCreate(
+                ['route_name' => $route],
+                ['module_id' => $module->id, 'title' => $module->title, 'type' => Str::after($route,'.')]
             );
         }
     }

@@ -16,11 +16,13 @@ class LoginController extends Controller
     public function read(Request $request){
         $result = User::where('number',$request->get('number'))->first();
         $available = $result !=null && Hash::check($request->get('password'),$result->password);
-        $token = $available == null ? : $this->token([
-            'device' => $request->header('x-device'),
-            'user_id' => $result->id
-        ]);
-        $result['type'] = $result->types()->first()->type;
+        if($available){
+            $token =  $this->token([
+                'device' => $request->header('x-device'),
+                'user_id' => $result->id
+            ]);
+            $result['type'] = $result->types()->first()->type;
+        }
         return ($available) ?
             $this->responseTrait([
                 'code' => null,

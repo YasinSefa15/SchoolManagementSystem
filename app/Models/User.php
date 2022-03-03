@@ -38,6 +38,10 @@ class User extends Authenticatable
         $this->attributes ['identification'] = bcrypt($password);
     }
 
+    public function countStudents(){
+        return $this->hasMany(StudentToSupervisior::class,'lecturer_id','id');
+    }
+
     public function supervisior(){
         return $this->hasOne(StudentToSupervisior::class,'student_id','id');
     }

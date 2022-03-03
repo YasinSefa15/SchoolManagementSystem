@@ -15,7 +15,7 @@ class UserToLetterGradeController extends Controller
         $rules = [
             'letter_grade' => 'required|in:AA,BA,BB,CB,CC,DC,DD,FF,DZ',
             'user_id' => 'required|integer|exists:user_to_lectures,user_id',
-            'lecture' => 'required|integer|exists:user_to_lectures,lecture_id'
+            'lecture_id' => 'required|integer|exists:user_to_lectures,lecture_id'
         ];
 
         $validator = Validator::make($request->all(),$rules);
@@ -28,7 +28,7 @@ class UserToLetterGradeController extends Controller
         }
         $result = UserToLetterGrade::create([
            'user_id' => $request->get('user_id'),
-           'lecture' => $request->get('lecture'),
+           'lecture_id' => $request->get('lecture_id'),
            'letter_grade' => $request->get('letter_grade')
         ]);
         return $this->responseTrait([
@@ -41,7 +41,7 @@ class UserToLetterGradeController extends Controller
         $rules = [
             'letter_grade' => 'required|in:AA,BA,BB,CB,CC,DC,DD,FF,DZ',
             'user_id' => 'required|integer|exists:user_to_lectures,user_id',
-            'lecture' => 'required|integer|exists:user_to_lectures,lecture_id'
+            'lecture_id' => 'required|integer|exists:user_to_lectures,lecture_id'
         ];
 
         $validator = Validator::make($request->all(),$rules);
@@ -53,7 +53,7 @@ class UserToLetterGradeController extends Controller
             ]);
         }
         $result = UserToLetterGrade::where('user_id', $request->get('user_id'))
-            ->where('lecture',$request->get('lecture'))
+            ->where('lecture_id',$request->get('lecture_id'))
             ->update([
             'letter_grade' => $request->get('letter_grade')
                  ]);

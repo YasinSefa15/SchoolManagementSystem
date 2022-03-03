@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('token',255)->unique();
             $table->enum('device',['mobile','desktop','web','other']);
+            $table->timestamp('last_used_at');
         });
     }
 

@@ -37,20 +37,11 @@ class SupervisorController extends Controller
         ], 'create');
     }
 
-    //ilgili departmanın danışmanları
-    public function read(Request $request){
-        $result = Department::with('lecturers')->where('id',$request->get('department_id'))->get(); //
-        return $this->responseTrait([
-            'code' => null,
-            'message' => $request->route()->getName(),
-            'result' => $result
-        ], 'read');
-    }
-
     public function update(Request $request){
         $rules = [
-            'student_id' => 'required|integer|exists:student_to_supervisior,student_id',
-            'lecturer_id' => 'required|integer|exists:lecture_to_supervisor,lecturer_id'
+            'status' => 'required|in:active,passive',
+            'lecturer_id' => 'required|integer|exists:lecturer_to_supervisor,lecturer_id',
+
         ];
         $validator = Validator::make($request->all(),$rules);
         if($validator->fails()){
@@ -61,17 +52,27 @@ class SupervisorController extends Controller
             ]);
         }
 
-        $result = StudentToSupervisior::query()
-            ->where('student_id',$request->get('student_id'))
-            ->where('lecturer_id',$request->get('lecturer_id'))
-            ->first();
-        $result == null ? : $result->update(['lecturer_id' => $request->get('lecturer_id')]);
+        $result = Supervisor::query()
+            ->where('lecturer_id',$request->get('lecturer_id'));
+        $result->first() == null ? : $result->update(['status' => $request->get('status')]);
 
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
-            'result' => $result
+            'result' => $result->first()
         ], 'update');
+    }
+    public function read(Request $request){
+        $result = Department::with('lecturers')
+            ->where('id',$request->get('department_id'))->get();
+        foreach ($result[0]->lecturers as $lecturer){
+            $lecturer->loadCount('countStudents');
+        }
+        return $this->responseTrait([
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'read');
     }
 
     public function view(Request $request,$id){

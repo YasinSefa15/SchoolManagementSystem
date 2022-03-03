@@ -9,17 +9,12 @@ use App\Models\UserToLecture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use function PHPUnit\Framework\isNan;
-use function PHPUnit\Framework\isNull;
 
 class UserToLectureController extends Controller
 {
-    //create-delete
     use ResponseTrait;
     public function create(Request $request){
         $rules = [
-            'user_id' => 'required|integer|exists:user_to_type,user_id,type,student',
             'lecture_id' => 'required|integer|exists:lectures,id'
         ];
         $validator = Validator::make($request->all(),$rules);
@@ -34,7 +29,7 @@ class UserToLectureController extends Controller
         $lecture = Lecture::where('id','=',$request->get('lecture_id'))->first();
         if ($lecture->registered < $lecture->quota){
             $result = $lecture->usersToLectures()->create([
-               'user_id' => $request->get('user_id')
+               'user_id' => $request->get('user')['id']
             ]);
             $lecture->increment('registered');
         }
@@ -45,9 +40,8 @@ class UserToLectureController extends Controller
         ], 'create');
     }
 
-    public function update(Request $request){
+    public function update(Request $request,$lecture_id){
         $rules = [
-            'lecture_id' => 'required|integer',
             'user_id' => 'required|integer',
             'status' => 'required|in:approved,pending,rejected'
         ];
@@ -59,9 +53,8 @@ class UserToLectureController extends Controller
                 'result' => $validator->errors()
             ]);
         }
-
         $result = UserToLecture::where('user_id',$request->get('user_id'))
-            ->where('lecture_id',$request->get('lecture_id'));
+            ->where('lecture_id',$lecture_id);
 
         if (($result->first())){
             if ($request->get('status') == 'rejected'){
@@ -72,7 +65,6 @@ class UserToLectureController extends Controller
             }
         }
 
-
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
@@ -81,19 +73,8 @@ class UserToLectureController extends Controller
     }
 
     public function read(Request $request){
-        $rules = [
-            'lecturer_id' => 'required|integer'
-        ];
-        $validator = Validator::make($request->all(),$rules);
-        if ($validator->fails()){
-            return $this->responseTrait([
-                'code' => 400,
-                'message' => 'Lütfen formunuzu kontrol ediniz.',
-                'result' => $validator->errors()
-            ]);
-        }
             $result = DB::table('student_to_supervisor')
-                ->where('student_to_supervisor.lecturer_id','=',$request->get('lecturer_id'))
+                ->where('student_to_supervisor.lecturer_id','=',$request->get('user')['id'])
                 ->join('users', function ($join) {
                     $join->on('users.id', '=', 'student_to_supervisor.student_id');
                 })
@@ -116,7 +97,7 @@ class UserToLectureController extends Controller
             'code' => null,
             'message' => $request->route()->getName(),
             'result' => $result,
-        ], 'create');
+        ], 'read');
     }
 
 }

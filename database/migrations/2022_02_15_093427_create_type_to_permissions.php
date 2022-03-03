@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreign('type_id')->references('id')->on('user_types');
             $table->unsignedBigInteger('module_to_route_id');
             $table->foreign('module_to_route_id')->references('id')->on('module_to_routes');
-            $table->enum('type',['personal','general']);
+            $table->enum('type',['personal','general'])->default('general');
         });
     }
 

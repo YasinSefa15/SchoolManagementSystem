@@ -7,7 +7,6 @@ use App\Http\Traits\ResponseTrait;
 use App\Models\Lecture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use function dd;
 
 class LectureController extends Controller
 {
@@ -62,8 +61,10 @@ class LectureController extends Controller
                 'result' => $validator->errors()
             ]);
         }
-        $result = Lecture::where('year','=',$request->get('year'))
+        $result = Lecture::query()
+            ->where('year','=',$request->get('year'))
             ->where('semester','=',$request->get('semester'))
+            ->where('department_id',$request->get('department_id'))
             ->get();
         return $this->responseTrait([
             'code' => null,
@@ -102,14 +103,15 @@ class LectureController extends Controller
         ], 'update');
     }
 
-    /** todo : user lecture ilişkileri halledilince recheck */
-    public function view(Request $request,$id){
-        $result = Lecture::with('users.grades','exams')->where('id',$id)->first();
+    public function view(Request $request,$lecture_id){
+        $result = Lecture::with('users','exams','users.grades')
+            ->where('id',$lecture_id)
+            ->get();
 
         return $this->responseTrait([
-                'code' => null,
-                'message' => $request->route()->getName(),
-                'result' => $result
-                ], 'read');
+            'code' => null,
+            'message' => $request->route()->getName(),
+            'result' => $result
+        ], 'read');
     }
 }

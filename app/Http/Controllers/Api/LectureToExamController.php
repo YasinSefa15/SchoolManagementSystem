@@ -14,11 +14,9 @@ class LectureToExamController extends Controller
     use ResponseTrait;
     public function create(Request $request){
         $rules = [
-            'lecture_id' => 'required|integer|exists:lectures,id',
             'type' => 'required|string',
             'percentage' => 'required|integer'
         ];
-
         $validator = Validator::make($request->all(),$rules);
 
         if($validator->fails()){
@@ -29,7 +27,7 @@ class LectureToExamController extends Controller
             ]);
         }
         $result = LectureToExam::create([
-            'lecture_id' => $request->get('lecture_id'),
+            'lecture_id' => $request->get('user')['id'],
             'type' => $request->get('type'),
             'percentage' => $request->get('percentage')
         ]);
@@ -41,8 +39,8 @@ class LectureToExamController extends Controller
         ], 'create');
     }
 
-    public function read(Request $request,$id){
-        $result = Lecture::where('lecturer_id',$id)->with('exams')->get();
+    public function read(Request $request,$lecture_id){
+        $result = Lecture::with('exams')->where('id',$lecture_id)->get();
 
         return $this->responseTrait([
             'code' => null,
@@ -60,9 +58,9 @@ class LectureToExamController extends Controller
         ], 'view');
     }
 
-    public function update(Request $request,$id){
+    public function update(Request $request,$lecture_id,$exam_id){
         $rules = [
-            'lecture_id' => 'nullable|integer|exists:lecture_to_exams,id',
+            'lecture_id' => 'nullable|integer',
             'type' => 'nullable|string',
             'percentage' => 'nullable|integer'
         ];
@@ -74,7 +72,7 @@ class LectureToExamController extends Controller
                 'result' => $validator->errors()
             ]);
         }
-        $result = LectureToExam::where('id',$id)->first();
+        $result = LectureToExam::where('id',$exam_id)->first();
         $result == null ? : $result->update($request->all());
         return $this->responseTrait([
             'code' => null,
@@ -83,9 +81,8 @@ class LectureToExamController extends Controller
         ], 'update');
     }
 
-    public function delete(Request $request,$id){
-        $result = LectureToExam::where('id',$id)->first();
-
+    public function delete(Request $request,$lecture_id,$exam_id){
+        $result = LectureToExam::where('id',$exam_id)->first();
         $result = $result?->delete();
 
         return $this->responseTrait([

@@ -25,4 +25,5 @@ class Department extends Model
     public function lecturers(){
         return $this->hasManyThrough(User::class,Supervisor::class,'department_id','id','id','lecturer_id');
     }
+
 }

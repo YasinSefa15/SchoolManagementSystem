@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 
 trait TokenTrait
 {
+    /** TODO : last  seen update */
     public function token(array $config){
         $newToken = Str::random(255);
         $userToken = UserToken::where(

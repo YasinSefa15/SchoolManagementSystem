@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ResponseTrait;
+use App\Models\StudentToSupervisior;
 use App\Models\Supervisor;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class UserController extends Controller
     public function create(Request $request){
         $rules = [
             'name' => 'required|string',
-            'email' => 'required|string|unique:users,email',
+            'email' => 'nullable|string|unique:users,email',
             'type' => 'required|string|exists:user_types,type',
             'identification' => 'required|integer',
             'department_id' => 'required|integer|exists:departments,id',
@@ -30,6 +31,7 @@ class UserController extends Controller
                 'result' => $validator->errors()
             ]);
         }
+
         $result = User::create([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
@@ -46,9 +48,7 @@ class UserController extends Controller
            'department_id' => $request->get('department_id')
         ]);
         if ($request->get('type') == 'student'){
-            $supervisior = Supervisor::where('department_id',$request->get('department_id'))->get()->random(1)->first();
             $result->supervisior()->create([
-                'lecturer_id' => $supervisior->lecturer_id
             ]);
         }
 
@@ -61,14 +61,26 @@ class UserController extends Controller
     }
 
     public function read(Request $request){
-        /** todo : users dan gelen parametreye göre islem yapılması gerekebilir*/
         $department_id = $request->get('department_id');
         $result = DB::table('users')
-            ->join('user_to_type','users.id','=','user_to_type.user_id')
+            ->join('user_to_department','users.id','=','user_to_department.user_id')
             ->when($department_id, function ($query,$department_id){
-                $query->where('department_id',$department_id);
-        })
-            ->get();
+                $query->where('user_to_department.department_id','=',$department_id);
+            })
+            ->join('user_to_type','users.id','=','user_to_type.user_id')
+            ->when($request->get('type'),function ($join) use($request){
+                $join->where('user_to_type.type','=',$request->get('type'));
+            });
+
+        if ($request->get('type') == 'student'){
+            $result->join('student_to_supervisor', function ($join) use($request){
+                $join->when($request->get('type') == 'student',function ($join) use($request){
+                    $join->where('user_to_type.type','=',$request->get('type'))
+                        ->on('student_to_supervisor.student_id', '=', 'users.id');
+                });
+            });
+        }
+        $result = $result->get();
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),
@@ -105,6 +117,12 @@ class UserController extends Controller
                 'type' => $type->type
             ]);
         }
+        if ($request->get('lecturer_id')){
+            StudentToSupervisior::create([
+               'lecturer_id' => $request->get('lecturer_id'),
+               'student_id' => $id
+            ]);
+        }
 
         return $this->responseTrait([
             'code' => null,
@@ -123,6 +141,6 @@ class UserController extends Controller
             'code' => null,
             'message' => $request->route()->getName(),
             'result' => $result
-        ], 'read');
+        ], 'view');
     }
 }

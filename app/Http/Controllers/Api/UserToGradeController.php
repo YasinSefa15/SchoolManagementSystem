@@ -38,7 +38,6 @@ class UserToGradeController extends Controller
             'grade' => $request->get('grade')
         ]);
 
-
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),

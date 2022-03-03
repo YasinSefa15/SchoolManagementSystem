@@ -16,9 +16,7 @@ trait ResponseTrait
         return response()->json($config,$config['code']);
     }
 
-    //cannot return 204x
     public function getCode($config,$type = null){
-        //$config['code'] = 400;
         if (!isset($config['result']) || $config['result'] == null){
             unset($config['result']);
             $config['code'] = Response::HTTP_BAD_REQUEST;
