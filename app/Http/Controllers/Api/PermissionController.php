@@ -4,20 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ResponseTrait;
-use App\Models\ModuleRoute;
+use App\Models\Module;
 use App\Models\TypeToPermission;
+use App\Models\UserType;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
     use ResponseTrait;
 
-    /** todo : didnt like it */
     public function read(Request $request){
-        $result = null;
-
-        $result['routes'] = ModuleRoute::select('id','route_name','title','type')->get();
-
+        $result['types'] = UserType::get();
+        $result['data'] = Module::with('routes:id,module_id,route_name,title,type','routes.permissions')
+            ->get();
         return $this->responseTrait([
             'code' => null,
             'message' => $request->route()->getName(),

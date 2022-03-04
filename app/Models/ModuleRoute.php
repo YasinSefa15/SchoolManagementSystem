@@ -21,4 +21,8 @@ class ModuleRoute extends Model
     public function module(){
         return $this->hasOne(Module::class);
     }
+
+    public function permissions(){
+        return $this->hasMany(TypeToPermission::class,'module_to_route_id','id');
+    }
 }
