@@ -46,7 +46,7 @@ Route::controller(PermissionController::class)
 
 
 Route::controller(ModuleController::class)
-    ->middleware('authenticated')
+//    ->middleware('authenticated')
     ->name('module.')
     ->prefix('modules')
     ->group(function () {
@@ -54,17 +54,17 @@ Route::controller(ModuleController::class)
 });
 
 Route::controller(UserTypeController::class)
-    ->middleware('authenticated')
+//    ->middleware('authenticated')
     ->name('user-type.')
     ->prefix('user-type')
     ->group(function () {
         Route::any('/create', 'create')->name('create');
         Route::any('', 'read')->name('read');
-        Route::any('/update/{id}', 'update')->name('update');
+        Route::any('/delete/{id}','delete')->name('delete');
 });
 
 Route::controller(UserController::class)
-    ->middleware('authenticated')
+//    ->middleware('authenticated')
     ->name('user.')
     ->prefix('users')
     ->group(function () {
@@ -75,7 +75,7 @@ Route::controller(UserController::class)
 });
 
 Route::controller(FacultyController::class)
-    ->middleware('authenticated')
+//    ->middleware('authenticated')
     ->name('faculty.')
     ->prefix('faculties')
     ->group(function () {
@@ -85,7 +85,7 @@ Route::controller(FacultyController::class)
         Route::any('view/{id}', 'view')->name('view');
 });
 Route::controller(DepartmentController::class)
-    ->middleware('authenticated')
+//    ->middleware('authenticated')
     ->name('department.')
     ->prefix('departments')
     ->group(function () {
@@ -116,7 +116,7 @@ Route::controller(StudentToSupervisorController::class)
 });
 
 Route::controller(OfferedLectureController::class)
-    ->middleware('authenticated')
+//    ->middleware('authenticated')
     ->name('offeredlecture.')
     ->prefix('lectures-offered')
     ->group(function () {
@@ -128,7 +128,7 @@ Route::controller(OfferedLectureController::class)
 });
 
 Route::controller(LectureController::class)
-    ->middleware('authenticated')
+//    ->middleware('authenticated')
     ->name('lecture.')
     ->prefix('lectures')
     ->group(function () {

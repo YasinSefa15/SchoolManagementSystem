@@ -24,9 +24,7 @@ class PermissionMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->get('user')['type'] == 'admin'){
-            return $next($request);
-        }
+
         $userPermission = DB::table('type_to_permissions')
             ->where('type_id','=',$request->get('user')['type_id'])
             ->join('module_to_routes','module_to_routes.id','=','type_to_permissions.module_to_route_id')
@@ -38,7 +36,6 @@ class PermissionMiddleware
             if ($userPermission->type == 'general'){
                 return $next($request);
             }
-
 
             if($request->get('user')['type'] == 'lecturer'){
                 if ($request->route()->user_id){

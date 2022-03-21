@@ -16,6 +16,7 @@ class OfferedLectureController extends Controller
 {
     use ResponseTrait;
 
+    /** todo : user should sent time in +3UTC */
     public function create(Request $request){
         $rules = [
             'start_at' => 'required|date_format:Y-m-d H:i',
@@ -82,6 +83,12 @@ class OfferedLectureController extends Controller
     }
 
     public function read(Request $request){
+        $request->attributes->add([
+            'user' => [
+                'id' => $request->get('user_id'),
+            ]
+        ]);
+
         $result = DB::table('offered_lectures')
             ->where('start_at','<',now())
             ->where('end_at','>',now())
