@@ -19,7 +19,7 @@ class UserController extends Controller
             'name' => 'required|string',
             'email' => 'nullable|string|unique:users,email',
             'type' => 'required|string|exists:user_types,type',
-            'identification' => 'required|integer',
+            'identification' => 'required|integer|unique:users,identification',
             'department_id' => 'required|integer|exists:departments,id',
             'number' => 'required|integer'
         ];
@@ -34,8 +34,8 @@ class UserController extends Controller
 
         $result = User::create([
             'name' => $request->get('name'),
-            'email' => $request->get('email'),
-            'password' => substr($request->get('identification'),-6), //5 ti
+            'email' => $request->get('email') ?? null,
+            'password' => substr($request->get('identification'),-6),
             'identification' => $request->get('identification'),
             'number' => $request->get('type') == 'student' ? 'o'.$request->get('number') : 'h'.$request->get('number')
         ]);
@@ -110,17 +110,12 @@ class UserController extends Controller
            'email' => $request->get('email') ?? $result->email,
            'password' => $request->get('password') ??  $result->password
         ]);
+
         if($request->get('type') !== null) {
             $type = DB::table('user_types')->where('type',$request->get('type'))->first();
             $result->types()->update([
                 'type_id' => $type->id,
                 'type' => $type->type
-            ]);
-        }
-        if ($request->get('lecturer_id')){
-            StudentToSupervisior::create([
-               'lecturer_id' => $request->get('lecturer_id'),
-               'student_id' => $id
             ]);
         }
 

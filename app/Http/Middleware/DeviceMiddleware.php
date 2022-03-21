@@ -18,10 +18,13 @@ class DeviceMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $deviceToken = DB::table('user_tokens')->where('device','=',$request->header('x-device'))->first();
-        if (isset($deviceToken)){
+        if ($request->header('x-device') == 'mobile'  ||
+            $request->header('x-device') == 'desktop' ||
+            $request->header('x-device') == 'web'     ||
+            $request->header('x-device') == 'mobile'){
             return $next($request);
         }
+
 
         return response()->json([
             "code" => Response::HTTP_UNAUTHORIZED,

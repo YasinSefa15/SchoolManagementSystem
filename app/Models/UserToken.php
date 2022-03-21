@@ -17,7 +17,8 @@ class UserToken extends Model
     protected $fillable = [
         'user_id',
         'token',
-        'device'
+        'device',
+        'last_used_at'
     ];
 
     public function user(){

@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\DeviceMiddleware;
+use App\Http\Middleware\MethodMiddleware;
 use App\Http\Middleware\TokenMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -48,9 +49,16 @@ class Kernel extends HttpKernel
         ],
 
         'authenticated' => [
+            'method' => MethodMiddleware::class,
             'device' => \App\Http\Middleware\DeviceMiddleware::class,
             'token' =>  \App\Http\Middleware\TokenMiddleware::class,
-            'permission' =>  \App\Http\Middleware\PermissionMiddleware::class,
+            'permission' =>  \App\Http\Middleware\PermissionMiddleware::class
+        ],
+
+        'guest' => [
+            'guest' => \App\Http\Middleware\GuestMiddleware::class,
+            'device' => DeviceMiddleware::class,
+            'method' => MethodMiddleware::class,
         ]
     ];
 
@@ -66,11 +74,10 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        //'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'guest' => \App\Http\Middleware\GuestMiddleware::class,
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        //'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
     ];
 }

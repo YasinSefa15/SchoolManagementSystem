@@ -64,7 +64,6 @@ class LectureController extends Controller
         $result = Lecture::query()
             ->where('year','=',$request->get('year'))
             ->where('semester','=',$request->get('semester'))
-            ->where('department_id',$request->get('department_id'))
             ->get();
         return $this->responseTrait([
             'code' => null,

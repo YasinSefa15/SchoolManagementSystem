@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Traits\APIMessage;
 use App\Http\Traits\ResponseTrait;
 use App\Http\Traits\TokenTrait;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\HttpFoundation\Response;
 
 class LoginController extends Controller
 {
